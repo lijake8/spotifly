@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>my page</title>
+      <link rel="stylesheet" href="{{url_for('static',filename='dist/output.css')}}">
+      <!-- <script src="components/card.js" type="text/javascript" defer></script> -->
+      <script src="{{ url_for('static', filename='components/card.js') }}"></script>
+      
+  </head>
+  <body>
+    <header-component></header-component>
+    <div class="bg-green-300 px-3 py-1">
+      <h2 class="text-3xl font-light text-white m-0">Beans Love Beers</h2>
+    </div>
+    <!-- Search Bar -->
+    <div class="container">
+      <input type="text" placeholder="Search for beer..."
+        class="border-2 ml-64 border-gray-700 w-2/5 mt-10 py-3 px-4"></input>
+      <button class="bg-blue-700 text-xl hover:bg-blue-500 text-white py-2 px-3">Search</button>
+    </div>
+    <!-- Selection -->
+
+    <audio id="audioPlayer"></audio>
+    <div id="hoverElement">
+      <!-- Content -->
+      <p>hover on me for audio</p>
+    </div>
+
+    <div class="container">
+      <div class="grid gap-8 grid-cols-3 mt-5 pl-5">
+        <card-component></card-component>
+        <card-component></card-component>
+        <card-component></card-component>
+        <card-component></card-component>
+        <card-component></card-component>
+        <card-component></card-component>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='src/script.js') }}"></script>
+    
+  </body>
+</html>
