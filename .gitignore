@@ -1,3 +1,15 @@
 # node_modules folder
-node_modules
+/node_modules
 
+# local env files
+.env
+
+# OS generated files
+.DS_Store
+
+# python env
+/env
+
+/api data templates
+
+/.flask_session

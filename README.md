@@ -1,3 +1,7 @@
+to setup:
+pip install -r requirements.txt
+env/scripts/activate
+
 https://flowbite.com/docs/getting-started/flask/
 need split terminal
   python app.py

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>login page</title>
+      <link rel="stylesheet" href="{{url_for('static',filename='dist/output.css')}}">
+      
+  </head>
+  <body>
+    <div>
+      <button onclick="location.href='{{ auth_url }}'" type="button" class="flex border-2 border-blue-500">login</button>
+    </div>
+  </body>
+</html>
