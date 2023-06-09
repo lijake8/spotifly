@@ -1,25 +1,18 @@
-// Get the element that triggers the audio playback on hover
-const hoverElement = document.getElementById('hoverElement');
+// Get all elements with the class 'hoverElement'
+const hoverElements = document.getElementsByClassName('hoverElement');
 
-// Get the audio player element
-const audioPlayer = document.getElementById('audioPlayer');
+// Add event listeners to each hover element
+Array.from(hoverElements).forEach((element) => {
+    const audioPlayer = element.getElementsByTagName('audio')[0];
+    const audioSourceUrl = element.dataset.audioUrl; //By using the dataset property, you can access custom data attributes prefixed with "data-". The dataset property is an object that contains all the custom data attributes of the element as properties. The dataset property automatically converts the kebab-case format (data-audio-url) of the custom attribute name into camelCase format (audioUrl) when accessed as a property
 
-// Set the source URL of the audio file
-const audioSourceUrl = 'https://p.scdn.co/mp3-preview/4d9bde799eec8913e53c184c45b9fd575690b917?cid=9688e06282ff4043a95d46dee1f7467d';
+    element.addEventListener('mouseenter', () => {
+        audioPlayer.src = audioSourceUrl;
+        audioPlayer.play();
+    });
 
-// Add a hover event listener to the hover element
-hoverElement.addEventListener('mouseenter', () => {
-    // Set the source URL of the audio player
-    audioPlayer.src = audioSourceUrl;
-    
-    // Play the audio
-    audioPlayer.play();
-});
-
-hoverElement.addEventListener('mouseleave', () => {
-    // Pause the audio
-    audioPlayer.pause();
-    
-    // Reset the audio player source
-    audioPlayer.src = '';
+    element.addEventListener('mouseleave', () => {
+        audioPlayer.pause();
+        audioPlayer.src = '';
+    });
 });
