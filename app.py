@@ -27,11 +27,6 @@ SCOPES_URL = '+'.join(SCOPES_LIST)
 @app.route("/")
 @app.route("/index")
 def index():
-	return render_template("index.html")
-	
-
-@app.route("/login")
-def login():
 	#store the token info in the session framework provided by flask; then create a SpotifyOAuth object
 	cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session) 
 	auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
@@ -44,7 +39,7 @@ def login():
 	if request.args.get("code"): #access parameter '?code=' in the URL
 		# Step 2. Being redirected from Spotify auth page
 		auth_manager.get_access_token(request.args.get("code"))
-		return redirect('/login')
+		return redirect('/')
 
 	if not auth_manager.validate_token(cache_handler.get_cached_token()):
 		# Step 1. Display spotify sign in page when no token
@@ -55,12 +50,14 @@ def login():
 	spotify = spotipy.Spotify(auth_manager=auth_manager)
 	user = spotify.me()
 	return render_template('user.html', user=user)
+	
+
 
 
 @app.route('/sign_out')
 def sign_out():
     session.pop("token_info", None)
-    return redirect('/login')
+    return redirect('/')
 
 
 @app.route('/playlists')
