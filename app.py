@@ -107,9 +107,9 @@ def test():
 
 @app.route('/test2')
 def test2():
-	items = [{'title': 'blah1', 'description': 'blahblah1'}, {'title': 'blah2', 'description': 'blahblah2'}, {'title': 'blah3', 'description': 'blahblah3'}]
-	items1 = [{'title': 'bruh1', 'description': 'bruhbruh1'}, {'title': 'bruh2', 'description': 'bruhbruh2'}, {'title': 'bruh3', 'description': 'bruhbruh3'}]
-	items2 = [{'title': 'dawg1', 'description': 'dawgdawg1'}, {'title': 'dawg2', 'description': 'dawgdawg2'}, {'title': 'dawg3', 'description': 'dawgdawg3'}]
+	items = [{'title': 'blah1', 'description': 'blahblah1'}, {'title': 'blah2', 'description': 'blahblah2'}, {'title': 'blah3', 'description': 'blahblah3'}, {'title': 'blah4', 'description': 'blahblah4'}]
+	items1 = [{'title': 'bruh1', 'description': 'bruhbruh1'}, {'title': 'bruh2', 'description': 'bruhbruh2'}, {'title': 'bruh3', 'description': 'bruhbruh3'}, {'title': 'bruh4', 'description': 'bruhbruh4'}, {'title': 'bruh5', 'description': 'bruhbruh5'}]
+	items2 = [{'title': 'dawg1', 'description': 'dawgdawg1'}, {'title': 'dawg2', 'description': 'dawgdawg2'}, {'title': 'dawg3', 'description': 'dawgdawg3'}, {'title': 'dawg4', 'description': 'dawgdawg4'}, {'title': 'dawg5', 'description': 'dawgdawg5'}, {'title': 'dawg6', 'description': 'dawgdawg6'}]
 	return render_template('test-radio.html', items=items, items1=items1, items2=items2)
 
 
