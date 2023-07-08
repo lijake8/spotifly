@@ -52,8 +52,6 @@ def index():
 	return render_template('user.html', user=user)
 	
 
-
-
 @app.route('/sign_out')
 def sign_out():
     session.pop("token_info", None)
@@ -64,8 +62,8 @@ def sign_out():
 def playlists():
     cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
     auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
-											   client_secret=CLIENT_SECRET,
-											   redirect_uri=REDIRECT_URI, 
+                                               client_secret=CLIENT_SECRET,
+                                               redirect_uri=REDIRECT_URI, 
                                                cache_handler=cache_handler)
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
         return redirect('/')
@@ -78,8 +76,8 @@ def playlists():
 def currently_playing():
     cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
     auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
-											   client_secret=CLIENT_SECRET,
-											   redirect_uri=REDIRECT_URI,
+                                               client_secret=CLIENT_SECRET,
+                                               redirect_uri=REDIRECT_URI,
                                                cache_handler=cache_handler)
     if not auth_manager.validate_token(cache_handler.get_cached_token()):
         return redirect('/')
@@ -92,15 +90,49 @@ def currently_playing():
 
 @app.route('/current_user')
 def current_user():
-    cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
-    auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
+	cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
+	auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
 											   client_secret=CLIENT_SECRET,
 											   redirect_uri=REDIRECT_URI,
-                                               cache_handler=cache_handler)
-    if not auth_manager.validate_token(cache_handler.get_cached_token()):
-        return redirect('/')
-    spotify = spotipy.Spotify(auth_manager=auth_manager)
-    return spotify.current_user()
+											   cache_handler=cache_handler)
+	if not auth_manager.validate_token(cache_handler.get_cached_token()):
+			return redirect('/')
+	spotify = spotipy.Spotify(auth_manager=auth_manager)
+	return spotify.me()
+
+
+@app.route('/test')
+def test():
+	return render_template('test.html')
+
+@app.route('/test2')
+def test2():
+	items = [{'title': 'blah1', 'description': 'blahblah1'}, {'title': 'blah2', 'description': 'blahblah2'}, {'title': 'blah3', 'description': 'blahblah3'}]
+	items1 = [{'title': 'bruh1', 'description': 'bruhbruh1'}, {'title': 'bruh2', 'description': 'bruhbruh2'}, {'title': 'bruh3', 'description': 'bruhbruh3'}]
+	items2 = [{'title': 'dawg1', 'description': 'dawgdawg1'}, {'title': 'dawg2', 'description': 'dawgdawg2'}, {'title': 'dawg3', 'description': 'dawgdawg3'}]
+	return render_template('test-radio.html', items=items, items1=items1, items2=items2)
+
+
+@app.route('/user-view')
+def user_view():
+	return redirect('/')
+
+@app.route('/song-view')
+def song_view():
+	return redirect('/')
+
+@app.route('/album-view')
+def album_view():
+	return redirect('/')
+
+@app.route('/playlist-view')
+def playlist_view():
+	return redirect('/')
+
+@app.route('/artist-view')
+def artist_view():
+	return redirect('/')
+
 
 
 # In[4]: run app
