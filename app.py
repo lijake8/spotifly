@@ -203,9 +203,23 @@ def playlist_view(playlist_id):
 	return [(track['track']['name'], track['track']['preview_url']) for track in tracks]
 
 
-@app.route('/artist-view')
-def artist_view():
-	return redirect('/')
+@app.route('/artist-view/<artist_id>')
+def artist_view(artist_id):
+	cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
+	auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
+																							 client_secret=CLIENT_SECRET,
+																							 redirect_uri=REDIRECT_URI, 
+																							 cache_handler=cache_handler)
+	if not auth_manager.validate_token(cache_handler.get_cached_token()):
+			return redirect('/')
+	spotify = spotipy.Spotify(auth_manager=auth_manager)
+
+	artist = spotify.artist(artist_id)
+	albums = spotify.artist_albums(artist_id)
+	return {
+		'artist': artist, 
+		'albums': [album['name'] for album in albums['items']]
+	}
 
 
 
