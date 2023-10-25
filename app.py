@@ -130,9 +130,23 @@ def hover_test():
 def user_view():
 	return redirect('/')
 
-@app.route('/song-view')
-def song_view():
-	return redirect('/')
+@app.route('/song-view/<track_id>')
+def song_view(track_id):
+	cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
+	auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
+																							 client_secret=CLIENT_SECRET,
+																							 redirect_uri=REDIRECT_URI, 
+																							 cache_handler=cache_handler)
+	if not auth_manager.validate_token(cache_handler.get_cached_token()):
+			return redirect('/')
+	spotify = spotipy.Spotify(auth_manager=auth_manager)
+
+	track = spotify.track(track_id)
+	features = spotify.audio_features([track_id])
+	return {
+		'features': features, 
+		'track': track
+	}
 
 @app.route('/album-view')
 def album_view():
@@ -172,8 +186,7 @@ def playlist_view(playlist_id):
 
 	# print(playlist)
 	print('tracks in playlist:', len(tracks))
-
-	return [track['track']['name'] for track in tracks]
+	return [(track['track']['name'], track['track']['preview_url']) for track in tracks]
 
 
 @app.route('/artist-view')
