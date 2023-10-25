@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Slider Concatenation</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='dist/output.css')}}">
+  </head>
+  <body>
+      <h1>Slider Concatenation</h1>
+
+      <form method="POST" action="/concatenate">
+          <label for="slider1">Slider 1:</label>
+          <input type="range" id="slider1" name="slider1" min="1" max="100" value="1">
+          <span id="slider1_value">50</span>
+          <br>
+          
+          <label for="slider2">Slider 2:</label>
+          <input type="range" id="slider2" name="slider2" min="1" max="100" value="1">
+          <span id="slider2_value">50</span>
+          <br>
+          
+          <label for="slider3">Slider 3:</label>
+          <input type="range" id="slider3" name="slider3" min="1" max="100" value="1">
+          <span id="slider3_value">50</span>
+          <br>
+
+          <button type="submit" class="border-2 border-blue-500">Concatenate</button>
+      </form>
+
+      <div id="result">
+          Result: <span id="concatenated_result"></span>
+      </div>
+
+      <script>
+        function updateSliderValue(slider, value) {
+            document.getElementById(slider).innerText = value;
+        }
+
+        document.querySelectorAll('input[type="range"]').forEach(slider => {
+            const sliderId = slider.getAttribute('id');
+            const valueSpanId = sliderId + '_value';
+
+            slider.addEventListener('input', function () {
+                const value = this.value;
+                updateSliderValue(valueSpanId, value);
+            });
+
+            // Set the initial slider value to 50
+            slider.value = 50;
+            updateSliderValue(valueSpanId, 50);
+        });
+
+
+        document.querySelector('form').addEventListener('submit', function (e) {
+              e.preventDefault();
+
+              const formData = new FormData(this);
+
+              fetch('/concatenate', {
+                  method: 'POST',
+                  body: formData
+              })
+              .then(response => response.text())
+              .then(result => {
+                  document.getElementById('concatenated_result').innerText = result;
+              });
+          });
+      </script>
+  </body>
+</html>

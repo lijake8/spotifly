@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset="UTF-8" />
+      <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>3 Sliders and a Button</title>
+      <link rel="stylesheet" href="{{url_for('static',filename='dist/output.css')}}">
+  </head>
+  <body>
+      <h1>concat sliders and print below</h1>
+
+      <form action="/recommendation-sandbox" method="POST">
+          <input type="range" min="1" max="100" value="50" name="slider1" id="slider1">
+          <input type="range" min="1" max="100" value="50" name="slider2" id="slider2">
+          <input type="range" min="1" max="100" value="50" name="slider3" id="slider3">
+          <p id="slider1-value">50</p>
+          <p id="slider2-value">50</p>
+          <p id="slider3-value">50</p>
+
+          <button type="submit" class="border-2 border-blue-500">Run Python Function</button>
+      </form>
+
+      <p id="result">{{result}}</p>
+
+
+
+
+
+
+      <script>
+        // Update the slider value fields when a slider is moved
+        document.querySelectorAll("input[type='range']").forEach(slider => {
+          slider.addEventListener("input", () => {
+              document.getElementById("slider1-value").textContent = slider1.value;
+              document.getElementById("slider2-value").textContent = slider2.value;
+              document.getElementById("slider3-value").textContent = slider3.value;
+          });
+        });
+
+        
+          // Update the result text when a slider is moved
+          document.querySelectorAll("input[type='range']").forEach(slider => {
+              slider.addEventListener("input", () => {
+                  document.getElementById("result").textContent = "";
+              });
+          });
+      </script>
+  </body>
+</html>

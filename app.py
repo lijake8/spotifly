@@ -260,11 +260,46 @@ def recommendations(track_id):
 	spotify = spotipy.Spotify(auth_manager=auth_manager)
 
 	track = spotify.track(track_id)
-	recommendations = spotify.recommendations(seed_tracks=[track_id], limit=10)
+	recommendations = spotify.recommendations(seed_tracks=[track_id], limit=100)
 	return {
 		'original_track': track,
 		'recommendations': recommendations['tracks']
 	}
+
+
+@app.route('/recommendation-sandbox', methods=["GET", "POST"])
+def recommendation_sandbox():
+	"""Get recommendations based on song characteristics"""
+
+	def concatenate_slider_values(slider_values):
+		"""Concatenates the slider values as strings and returns the result."""
+		result = ""
+		for value in slider_values:
+				result += str(value)
+		return result
+
+	if request.method == "POST":
+		slider_values = [int(request.form["slider1"]), int(request.form["slider2"]), int(request.form["slider3"])]
+
+		# Run the Python function to concatenate the slider values
+		result = concatenate_slider_values(slider_values)
+
+		# Display the result below the button
+		return render_template("recommendation-sandbox.html", result=result)
+
+	return render_template("recommendation-sandbox.html")
+
+
+@app.route('/concatenate', methods=['GET', 'POST'])
+def concatenate():
+		if request.method == 'GET':
+				return render_template("concatenate.html")
+		if request.method == 'POST':
+				slider1 = request.form.get('slider1')
+				slider2 = request.form.get('slider2')
+				slider3 = request.form.get('slider3')
+				concatenated = str(slider1) + str(slider2) + str(slider3)
+				return concatenated
 
 
 # In[4]: run app
