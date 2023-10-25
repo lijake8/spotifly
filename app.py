@@ -245,6 +245,27 @@ def search(query):
 		'playlists': playlist_results['playlists']['items']
 	}
 
+#TODO: possibly just make this a func to call on the page and not a route, have a route for creating and saving a playlist based on recommnedations
+@app.route('/recommendations/<track_id>')
+def recommendations(track_id):
+	"""Get recommendations based on a track"""
+
+	cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
+	auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
+																							 client_secret=CLIENT_SECRET,
+																							 redirect_uri=REDIRECT_URI, 
+																							 cache_handler=cache_handler)
+	if not auth_manager.validate_token(cache_handler.get_cached_token()):
+			return redirect('/')
+	spotify = spotipy.Spotify(auth_manager=auth_manager)
+
+	track = spotify.track(track_id)
+	recommendations = spotify.recommendations(seed_tracks=[track_id], limit=10)
+	return {
+		'original_track': track,
+		'recommendations': recommendations['tracks']
+	}
+
 
 # In[4]: run app
 if __name__ == '__main__':
