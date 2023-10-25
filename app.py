@@ -126,9 +126,6 @@ def hover_test():
 	return render_template('hover-test.html', items=items, items1=items1, items2=items2)
 
 
-@app.route('/user-view')
-def user_view():
-	return redirect('/')
 
 @app.route('/song-view/<track_id>')
 def song_view(track_id):
@@ -221,6 +218,32 @@ def artist_view(artist_id):
 		'albums': [album['name'] for album in albums['items']]
 	}
 
+
+@app.route('/search/<query>')
+def search(query):
+	"""Search for tracks, albums, artists, playlists matching a search query"""
+
+	cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
+	auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
+																							 client_secret=CLIENT_SECRET,
+																							 redirect_uri=REDIRECT_URI, 
+																							 cache_handler=cache_handler)
+	if not auth_manager.validate_token(cache_handler.get_cached_token()):
+			return redirect('/')
+	spotify = spotipy.Spotify(auth_manager=auth_manager)
+
+	#search tracks, albums, artists, playlists
+	track_results = spotify.search(query, limit=10)
+	album_results = spotify.search(query, type='album', limit=10)
+	artist_results = spotify.search(query, type='artist', limit=10)
+	playlist_results = spotify.search(query, type='playlist', limit=10)
+
+	return {
+		'tracks': track_results['tracks']['items'],
+		'albums': album_results['albums']['items'],
+		'artists': artist_results['artists']['items'],
+		'playlists': playlist_results['playlists']['items']
+	}
 
 
 # In[4]: run app
