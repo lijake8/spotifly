@@ -20,6 +20,7 @@
       <div class="border-2 border-purple-500">
         <img src="{{playlist['images'][0]['url']}}" class="h-10 w-10" alt="playlist cover">
         <p>{{playlist['name']}}</p>
+        <a href="{{ url_for('playlist_view', playlist_id=playlist['id']) }}">View {{ playlist['id'] }}</a>
       </div>
       {% endfor %}
     </div>

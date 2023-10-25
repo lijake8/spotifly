@@ -3,6 +3,8 @@ import os
 from flask_session import Session
 import spotipy
 from dotenv import load_dotenv
+import requests
+import json
 
 # In[0]: allow api keys to be pulled from .env environment file
 load_dotenv()
@@ -22,6 +24,11 @@ REDIRECT_URI = os.getenv('REDIRECT_URI')
 SCOPES_LIST = ['user-read-currently-playing', 'playlist-modify-private']
 SCOPES_STR = ' '.join(SCOPES_LIST)
 SCOPES_URL = '+'.join(SCOPES_LIST)
+
+def get_auth_header(token):
+	return {
+		"Authorization": f"Bearer {token}"
+	}
 
 # In[3]: routes
 @app.route("/")
@@ -77,6 +84,7 @@ def playlists():
 				playlists.extend(results['items'])
 
 		print(len(playlists))
+		print(json.dumps(playlists[0]))
 		
 		return render_template('my-playlists.html', playlists=playlists)
 
@@ -130,9 +138,43 @@ def song_view():
 def album_view():
 	return redirect('/')
 
-@app.route('/playlist-view')
-def playlist_view():
-	return redirect('/')
+# @app.route('/playlist-view')
+@app.route('/playlist-view/<playlist_id>')
+def playlist_view(playlist_id):
+	
+	# NATIVE API WAY
+	# headers = get_auth_header(session['token_info']['access_token'])
+	# playlist_url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
+	# response = requests.get(playlist_url, headers=headers)
+	# playlist_items = response.json()['items']
+	# # print(json.dumps(playlist_items[0])) #single song in playlist
+	# print('NATIVE TOKEN', session['token_info']['access_token'])
+
+
+	# SPOTIPY WAY
+	cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
+	auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
+																							client_secret=CLIENT_SECRET,
+																							redirect_uri=REDIRECT_URI, 
+																							cache_handler=cache_handler)
+	if not auth_manager.validate_token(cache_handler.get_cached_token()):
+			return redirect('/')
+	spotify = spotipy.Spotify(auth_manager=auth_manager)
+	playlist = spotify.playlist(playlist_id)
+	# print('AUTH MANAGER TOKEN', auth_manager.get_access_token()) #session['token_info']['access_token']
+	# print('AUTH MANAGER TOKEN', auth_manager.get_cached_token())
+	# auth_manager.refresh_access_token(auth_manager.get_cached_token()['refresh_token'])
+
+	tracks = playlist['tracks']['items']
+	while playlist['tracks']['next']:
+			playlist['tracks'] = spotify.next(playlist['tracks'])
+			tracks.extend(playlist['tracks']['items'])
+
+	# print(playlist)
+	print('tracks in playlist:', len(tracks))
+
+	return [track['track']['name'] for track in tracks]
+
 
 @app.route('/artist-view')
 def artist_view():
