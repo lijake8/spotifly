@@ -148,9 +148,23 @@ def song_view(track_id):
 		'track': track
 	}
 
-@app.route('/album-view')
-def album_view():
-	return redirect('/')
+@app.route('/album-view/<album_id>')
+def album_view(album_id):
+	cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
+	auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
+																							 client_secret=CLIENT_SECRET,
+																							 redirect_uri=REDIRECT_URI, 
+																							 cache_handler=cache_handler)
+	if not auth_manager.validate_token(cache_handler.get_cached_token()):
+			return redirect('/')
+	spotify = spotipy.Spotify(auth_manager=auth_manager)
+
+	album = spotify.album(album_id)
+	tracks = spotify.album_tracks(album_id)
+	return {
+		'album': album, 
+		'tracks': tracks
+	}
 
 # @app.route('/playlist-view')
 @app.route('/playlist-view/<playlist_id>')
