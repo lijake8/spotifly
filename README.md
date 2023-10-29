@@ -21,3 +21,12 @@ sample mp3 urls:
 - https://p.scdn.co/mp3-preview/c01271a0cad40962ed4936c012ff5632398c9a34?cid=9688e06282ff4043a95d46dee1f7467d
 - https://p.scdn.co/mp3-preview/acf532e9831bc2dd5e5f3a6c0e92e1ed6d55beb7?cid=9688e06282ff4043a95d46dee1f7467d
 
+album id: 
+4HDJMKkwAMVFewqfZcmf84 (business as usual)
+2ti2e8J05nwg9ikcMjW8aS (essential britney spears)
+
+song id: 
+3ZZq9396zv8pcn5GYVhxUi (down under)
+
+artist id: 
+0f3EsoviYnRKTkmayI3cux (men at work)

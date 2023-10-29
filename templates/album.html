@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>page for album view</title>
+    <link
+      rel="stylesheet"
+      href="{{url_for('static',filename='dist/output.css')}}"
+    />
+    
+  </head>
+  <body>
+    <h1>songs in {{album['name']}} by {{album['artists'][0]['name']}}</h1>
+    
+
+    <div id="mainContent" class="grid gap-8 grid-cols-3 mt-5 pl-5 pr-5 border-2 border-red-500">
+      {% for track in tracks['items'] %}
+        <div class="hoverElement border-2 border-purple-500" data-audio-url="{{track['preview_url']}}">
+          <audio></audio>
+          <img src="{{album['images'][0]['url']}}" class="h-10 w-10" alt="album cover">
+          <p>{{track['name']}}</p>
+          <a href="{{ url_for('song_view', track_id=track['id']) }}">View track page for {{ track['id'] }}</a>
+        </div>
+      {% endfor %}
+    </div>
+  
+
+    <script src="{{ url_for('static', filename='src/playOnHover.js') }}"></script>
+  </body>
+</html>

@@ -158,10 +158,12 @@ def album_view(album_id):
 
 	album = spotify.album(album_id)
 	tracks = spotify.album_tracks(album_id)
-	return {
-		'album': album, 
-		'tracks': tracks
-	}
+	# return {
+	# 	'album': album, 
+	# 	'tracks': tracks
+	# }
+	return render_template('album.html', album=album, tracks=tracks)
+
 
 # @app.route('/playlist-view')
 @app.route('/playlist-view/<playlist_id>')
