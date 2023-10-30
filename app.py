@@ -21,7 +21,7 @@ CLIENT_ID = os.getenv('CLIENT_ID')
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')
 REDIRECT_URI = os.getenv('REDIRECT_URI')
 
-SCOPES_LIST = ['user-read-currently-playing', 'playlist-modify-private']
+SCOPES_LIST = ['user-read-currently-playing', 'playlist-modify-private', 'playlist-read-private', 'playlist-read-collaborative', 'user-library-read', 'user-library-modify']
 SCOPES_STR = ' '.join(SCOPES_LIST)
 SCOPES_URL = '+'.join(SCOPES_LIST)
 
@@ -29,6 +29,16 @@ def get_auth_header(token):
 	return {
 		"Authorization": f"Bearer {token}"
 	}
+
+def setup_api_client():
+	cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
+	auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
+																							client_secret=CLIENT_SECRET,
+																							redirect_uri=REDIRECT_URI,
+																							cache_handler=cache_handler)
+	if not auth_manager.validate_token(cache_handler.get_cached_token()):
+			return redirect('/')
+	return spotipy.Spotify(auth_manager=auth_manager)
 
 # In[3]: routes
 @app.route("/")
@@ -67,15 +77,7 @@ def sign_out():
 
 @app.route('/playlists')
 def playlists():
-		cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
-		auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
-																							 client_secret=CLIENT_SECRET,
-																							 redirect_uri=REDIRECT_URI, 
-																							 cache_handler=cache_handler)
-		if not auth_manager.validate_token(cache_handler.get_cached_token()):
-				return redirect('/')
-
-		spotify = spotipy.Spotify(auth_manager=auth_manager)
+		spotify = setup_api_client()
 		#loop thru to get all the playlists because the limit is 50 at a time
 		results = spotify.current_user_playlists(limit=50, offset=0)
 		playlists = results['items']
@@ -91,14 +93,7 @@ def playlists():
 
 @app.route('/currently_playing')
 def currently_playing():
-		cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
-		auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
-																							 client_secret=CLIENT_SECRET,
-																							 redirect_uri=REDIRECT_URI,
-																							 cache_handler=cache_handler)
-		if not auth_manager.validate_token(cache_handler.get_cached_token()):
-				return redirect('/')
-		spotify = spotipy.Spotify(auth_manager=auth_manager)
+		spotify = setup_api_client()
 		track = spotify.current_user_playing_track()
 		if not track is None:
 				return track
@@ -107,14 +102,7 @@ def currently_playing():
 
 @app.route('/current_user')
 def current_user():
-	cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
-	auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
-												 client_secret=CLIENT_SECRET,
-												 redirect_uri=REDIRECT_URI,
-												 cache_handler=cache_handler)
-	if not auth_manager.validate_token(cache_handler.get_cached_token()):
-			return redirect('/')
-	spotify = spotipy.Spotify(auth_manager=auth_manager)
+	spotify = setup_api_client()
 	return spotify.me()
 
 
@@ -129,14 +117,7 @@ def hover_test():
 
 @app.route('/song-view/<track_id>')
 def song_view(track_id):
-	cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
-	auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
-																							 client_secret=CLIENT_SECRET,
-																							 redirect_uri=REDIRECT_URI, 
-																							 cache_handler=cache_handler)
-	if not auth_manager.validate_token(cache_handler.get_cached_token()):
-			return redirect('/')
-	spotify = spotipy.Spotify(auth_manager=auth_manager)
+	spotify = setup_api_client()
 
 	track = spotify.track(track_id)
 	features = spotify.audio_features([track_id])
@@ -147,14 +128,7 @@ def song_view(track_id):
 
 @app.route('/album-view/<album_id>')
 def album_view(album_id):
-	cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
-	auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
-																							 client_secret=CLIENT_SECRET,
-																							 redirect_uri=REDIRECT_URI, 
-																							 cache_handler=cache_handler)
-	if not auth_manager.validate_token(cache_handler.get_cached_token()):
-			return redirect('/')
-	spotify = spotipy.Spotify(auth_manager=auth_manager)
+	spotify = setup_api_client()
 
 	album = spotify.album(album_id)
 	tracks = spotify.album_tracks(album_id)
@@ -168,29 +142,9 @@ def album_view(album_id):
 # @app.route('/playlist-view')
 @app.route('/playlist-view/<playlist_id>')
 def playlist_view(playlist_id):
-	
-	# NATIVE API WAY
-	# headers = get_auth_header(session['token_info']['access_token'])
-	# playlist_url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
-	# response = requests.get(playlist_url, headers=headers)
-	# playlist_items = response.json()['items']
-	# # print(json.dumps(playlist_items[0])) #single song in playlist
-	# print('NATIVE TOKEN', session['token_info']['access_token'])
-
-
-	# SPOTIPY WAY
-	cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
-	auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
-																							client_secret=CLIENT_SECRET,
-																							redirect_uri=REDIRECT_URI, 
-																							cache_handler=cache_handler)
-	if not auth_manager.validate_token(cache_handler.get_cached_token()):
-			return redirect('/')
-	spotify = spotipy.Spotify(auth_manager=auth_manager)
+	spotify = setup_api_client()
 	playlist = spotify.playlist(playlist_id)
-	# print('AUTH MANAGER TOKEN', auth_manager.get_access_token()) #session['token_info']['access_token']
-	# print('AUTH MANAGER TOKEN', auth_manager.get_cached_token())
-	# auth_manager.refresh_access_token(auth_manager.get_cached_token()['refresh_token'])
+	
 
 	tracks = playlist['tracks']['items']
 	while playlist['tracks']['next']:
@@ -198,23 +152,43 @@ def playlist_view(playlist_id):
 			tracks.extend(playlist['tracks']['items'])
 
 	# print(playlist)
-	print('tracks in playlist:', len(tracks))
-	return [(track['track']['name'], track['track']['preview_url']) for track in tracks]
+	# print('tracks in playlist:', len(tracks))
+
+	# remove local file tracks because they have no preview
+	for track in tracks:
+		if track['track']['is_local']:
+			tracks.remove(track)
+	
+	return render_template('playlist.html', playlist=playlist, tracks=tracks)
+
+
+@app.route('/my-songs')
+def my_songs():
+	spotify = setup_api_client()
+
+	results = spotify.current_user_saved_tracks(limit=50, offset=0)
+	tracks = results['items']
+	while results['next']:
+			results = spotify.next(results)
+			tracks.extend(results['items'])
+
+	print(len(tracks))
+	return [track['track']['name'] for track in tracks]
+	# return render_template('playlist.html', tracks=tracks)
 
 
 @app.route('/artist-view/<artist_id>')
 def artist_view(artist_id):
-	cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
-	auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
-																							 client_secret=CLIENT_SECRET,
-																							 redirect_uri=REDIRECT_URI, 
-																							 cache_handler=cache_handler)
-	if not auth_manager.validate_token(cache_handler.get_cached_token()):
-			return redirect('/')
-	spotify = spotipy.Spotify(auth_manager=auth_manager)
+	spotify = setup_api_client()
 
 	artist = spotify.artist(artist_id)
 	albums = spotify.artist_albums(artist_id)
+
+	followers_str = str(round(artist['followers']['total']/1000000, 1)) + 'M' if artist['followers']['total'] > 1000000 else str(round(artist['followers']['total']/1000, 1)) + 'K' if artist['followers']['total'] > 1000 else '<1K'
+	artist_image_url = artist['images'][0]['url'] if len(artist['images']) > 0 else 'https://www.freeiconspng.com/uploads/spotify-icon-2.png'
+	artist_name = artist['name']
+	
+	return albums
 	return {
 		'artist': artist, 
 		'albums': [album['name'] for album in albums['items']]
@@ -225,14 +199,7 @@ def artist_view(artist_id):
 def search(query):
 	"""Search for tracks, albums, artists, playlists matching a search query"""
 
-	cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
-	auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
-																							 client_secret=CLIENT_SECRET,
-																							 redirect_uri=REDIRECT_URI, 
-																							 cache_handler=cache_handler)
-	if not auth_manager.validate_token(cache_handler.get_cached_token()):
-			return redirect('/')
-	spotify = spotipy.Spotify(auth_manager=auth_manager)
+	spotify = setup_api_client()
 
 	#search tracks, albums, artists, playlists
 	track_results = spotify.search(query, limit=10)
@@ -252,14 +219,7 @@ def search(query):
 def recommendations(track_id):
 	"""Get recommendations based on a track"""
 
-	cache_handler = spotipy.cache_handler.FlaskSessionCacheHandler(session)
-	auth_manager = spotipy.oauth2.SpotifyOAuth(client_id=CLIENT_ID,
-																							 client_secret=CLIENT_SECRET,
-																							 redirect_uri=REDIRECT_URI, 
-																							 cache_handler=cache_handler)
-	if not auth_manager.validate_token(cache_handler.get_cached_token()):
-			return redirect('/')
-	spotify = spotipy.Spotify(auth_manager=auth_manager)
+	spotify = setup_api_client()
 
 	track = spotify.track(track_id)
 	recommendations = spotify.recommendations(seed_tracks=[track_id], limit=100)

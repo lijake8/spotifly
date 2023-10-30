@@ -12,6 +12,18 @@ need split terminal
 ## notes
 custom components in html: https://www.freecodecamp.org/news/reusable-html-components-how-to-reuse-a-header-and-footer-on-a-website/
 
+native api way for eg playlist view
+  <!-- # NATIVE API WAY
+	# headers = get_auth_header(session['token_info']['access_token'])
+	# playlist_url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
+	# response = requests.get(playlist_url, headers=headers)
+	# playlist_items = response.json()['items']
+	# # print(json.dumps(playlist_items[0])) #single song in playlist
+	# print('NATIVE TOKEN', session['token_info']['access_token']) 
+  # print('AUTH MANAGER TOKEN', auth_manager.get_access_token()) #session['token_info']['access_token']
+	# print('AUTH MANAGER TOKEN', auth_manager.get_cached_token())
+	# auth_manager.refresh_access_token(auth_manager.get_cached_token()['refresh_token']) -->
+
 ## hardcodings for mocking
 sample mp3 urls: 
 - https://p.scdn.co/mp3-preview/4d9bde799eec8913e53c184c45b9fd575690b917?cid=9688e06282ff4043a95d46dee1f7467d
@@ -30,3 +42,5 @@ song id:
 
 artist id: 
 0f3EsoviYnRKTkmayI3cux (men at work)
+
+
