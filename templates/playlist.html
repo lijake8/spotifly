@@ -18,7 +18,7 @@
 
     <div id="mainContent" class="grid gap-8 grid-cols-3 mt-5 pl-5 pr-5 border-2 border-red-500">
       {% for track in tracks %}
-        <div class="hoverElement border-2 border-purple-500" data-audio-url="{{track['preview_url']}}">
+        <div class="hoverElement border-2 border-purple-500" data-audio-url="{{track['track']['preview_url']}}">
           <audio></audio>
           <img src="{{track['track']['album']['images'][0]['url']}}" class="h-10 w-10" alt="track album image">
           <p>{{track['track']['name']}}</p>

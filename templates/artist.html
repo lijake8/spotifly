@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>page for album view</title>
+    <link
+      rel="stylesheet"
+      href="{{url_for('static',filename='dist/output.css')}}"
+    />
+    
+  </head>
+  <body>
+    <div>
+      <h1>{{artist_name}}</h1>
+      <img src="{{artist_image_url}}" class="h-20 w-20" alt="artist image" />
+      <p>{{followers}} followers</p>
+    </div>
+    
+
+    <div class="grid gap-8 grid-cols-1 border-2 border-emerald-300">
+      <h2>liked songs</h2>
+    </div>
+
+    <div class="grid gap-8 grid-cols-1 border-2 border-violet-700">
+      <h2>top songs</h2>
+    </div>
+
+    <div class="grid gap-8 grid-cols-1 border-2 border-red-500">
+      <h2>discography</h2>
+      <h3>albums</h3>
+      {% for album_id, album in album_info.items() %}
+        <h4>{{album['album_name']}}, {{album['year']}}. Popularity: {{album['popularity']}}</h4>
+        <div class='grid gap-8 grid-cols-3 mt-5 pl-5 pr-5 border-2 border-yellow-300'>
+          {% for track in album['tracks'] %}
+            <div class="hoverElement border-2 border-purple-500" data-audio-url="{{track['preview_url']}}">
+              <audio></audio>
+              <img src="{{album['album_image_url']}}" class="h-10 w-10" alt="album cover">
+              <p>{{track['name']}}</p>
+              <a href="{{ url_for('song_view', track_id=track['id']) }}">View track page for {{ track['id'] }}</a>
+            </div>
+          {% endfor %}
+        </div>  
+      {% endfor %}
+
+      <h3>compilations</h3>
+      {% for album_id, album in compilation_info.items() %}
+        <h4>{{album['album_name']}}, {{album['year']}}. Popularity: {{album['popularity']}}</h4>
+        <div class='grid gap-8 grid-cols-3 mt-5 pl-5 pr-5 border-2 border-yellow-300'>
+          {% for track in album['tracks'] %}
+            <div class="hoverElement border-2 border-purple-500" data-audio-url="{{track['preview_url']}}">
+              <audio></audio>
+              <img src="{{album['album_image_url']}}" class="h-10 w-10" alt="album cover">
+              <p>{{track['name']}}</p>
+              <a href="{{ url_for('song_view', track_id=track['id']) }}">View track page for {{ track['id'] }}</a>
+            </div>
+          {% endfor %}
+        </div>  
+      {% endfor %}
+      
+      <h3>singles</h3>
+      {% for album_id, album in single_info.items() %}
+        <h4>{{album['album_name']}}, {{album['year']}}. Popularity: {{album['popularity']}}</h4>
+        <div class='grid gap-8 grid-cols-3 mt-5 pl-5 pr-5 border-2 border-yellow-300'>
+          {% for track in album['tracks'] %}
+            <div class="hoverElement border-2 border-purple-500" data-audio-url="{{track['preview_url']}}">
+              <audio></audio>
+              <img src="{{album['album_image_url']}}" class="h-10 w-10" alt="album cover">
+              <p>{{track['name']}}</p>
+              <a href="{{ url_for('song_view', track_id=track['id']) }}">View track page for {{ track['id'] }}</a>
+            </div>
+          {% endfor %}
+        </div>  
+      {% endfor %}
+
+    </div>
+  
+
+    <script src="{{ url_for('static', filename='src/playOnHover.js') }}"></script>
+  </body>
+</html>

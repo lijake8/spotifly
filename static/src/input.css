@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* add common styles for commonly used headers */
+@layer base {
+  h1 {
+    @apply text-2xl;
+    @apply font-extrabold;
+  }
+  h2 {
+    @apply text-xl;
+    @apply font-bold;
+  }
+  h3 {
+    @apply text-lg;
+    @apply font-semibold;
+  }
+  h4 {
+    @apply text-base;
+    @apply font-semibold;
+  }
+}

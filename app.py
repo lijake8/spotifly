@@ -143,16 +143,12 @@ def album_view(album_id):
 @app.route('/playlist-view/<playlist_id>')
 def playlist_view(playlist_id):
 	spotify = setup_api_client()
-	playlist = spotify.playlist(playlist_id)
-	
 
+	playlist = spotify.playlist(playlist_id)
 	tracks = playlist['tracks']['items']
 	while playlist['tracks']['next']:
 			playlist['tracks'] = spotify.next(playlist['tracks'])
 			tracks.extend(playlist['tracks']['items'])
-
-	# print(playlist)
-	# print('tracks in playlist:', len(tracks))
 
 	# remove local file tracks because they have no preview
 	for track in tracks:
@@ -182,17 +178,92 @@ def artist_view(artist_id):
 	spotify = setup_api_client()
 
 	artist = spotify.artist(artist_id)
-	albums = spotify.artist_albums(artist_id)
-
 	followers_str = str(round(artist['followers']['total']/1000000, 1)) + 'M' if artist['followers']['total'] > 1000000 else str(round(artist['followers']['total']/1000, 1)) + 'K' if artist['followers']['total'] > 1000 else '<1K'
 	artist_image_url = artist['images'][0]['url'] if len(artist['images']) > 0 else 'https://www.freeiconspng.com/uploads/spotify-icon-2.png'
 	artist_name = artist['name']
+
+	albums = spotify.artist_albums(artist_id, limit=50)
+	album_list = albums['items'] #list of SimplifiedAlbumObjects
+	while albums['next']:
+			albums = spotify.next(albums)
+			album_list.extend(albums['items'])
+
+	# if album is not primarily by this artist, ignore it
+	album_list = [album for album in album_list if album['artists'][0]['id'] == artist_id]
+
+	album_ids = [album['id'] for album in album_list] #get album ids to get tracks
 	
-	return albums
-	return {
-		'artist': artist, 
-		'albums': [album['name'] for album in albums['items']]
-	}
+	# get detailed album info from albums 20 at a time
+	detailed_albums = [] # list of AlbumObjects
+	for i in range(0, len(album_ids), 20):
+			detailed_albums.extend(spotify.albums(album_ids[i:i+20])['albums'])
+
+		
+	
+	album_info = {} # map of album id: {album image url:, album name:, album release date:, album total tracks:, popularity:, year:, tracks: [{name:, preview url:, id:}, ...]}
+	single_info = {}
+	compilation_info = {}
+	for album in detailed_albums:
+		if album['album_type'] == 'single':
+			single_info[album['id']] = {
+				'album_image_url': album['images'][0]['url'] if len(album['images']) > 0 else 'https://www.freeiconspng.com/uploads/spotify-icon-2.png',
+				'album_name': album['name'],
+				'album_release_date': album['release_date'],
+				'album_total_tracks': album['total_tracks'],
+				'popularity': album['popularity'],
+				'year': album['release_date'][:4], #first 4 chars of release date is the year
+				'tracks': []
+			}
+			for track in album['tracks']['items']:
+				single_info[album['id']]['tracks'].append({
+					'name': track['name'],
+					'preview_url': track['preview_url'],
+					'id': track['id']
+				})
+		elif album['album_type'] == 'compilation':
+			compilation_info[album['id']] = {
+				'album_image_url': album['images'][0]['url'] if len(album['images']) > 0 else 'https://www.freeiconspng.com/uploads/spotify-icon-2.png',
+				'album_name': album['name'],
+				'album_release_date': album['release_date'],
+				'album_total_tracks': album['total_tracks'],
+				'popularity': album['popularity'],
+				'year': album['release_date'][:4], #first 4 chars of release date is the year
+				'tracks': []
+			}
+			for track in album['tracks']['items']:
+				compilation_info[album['id']]['tracks'].append({
+					'name': track['name'],
+					'preview_url': track['preview_url'],
+					'id': track['id']
+				})
+		else:
+			album_info[album['id']] = {
+				'album_image_url': album['images'][0]['url'] if len(album['images']) > 0 else 'https://www.freeiconspng.com/uploads/spotify-icon-2.png',
+				'album_name': album['name'],
+				'album_release_date': album['release_date'],
+				'album_total_tracks': album['total_tracks'],
+				'popularity': album['popularity'],
+				'year': album['release_date'][:4], #first 4 chars of release date is the year
+				'tracks': []
+			}
+			for track in album['tracks']['items']:
+				album_info[album['id']]['tracks'].append({
+					'name': track['name'],
+					'preview_url': track['preview_url'],
+					'id': track['id']
+				})
+		
+	
+	# return {
+	# 	'artist_image_url': artist_image_url,
+	# 	'artist_name': artist_name,
+	# 	'followers': followers_str,
+	# 	'album_info': album_info,
+	# 	'liked_tracks': [],
+	# 	'top_tracks': []
+	# }
+	return render_template('artist.html', artist_image_url=artist_image_url, artist_name=artist_name, followers=followers_str, album_info=album_info, liked_tracks=[], top_tracks=[], single_info=single_info, compilation_info=compilation_info)
+
 
 
 @app.route('/search/<query>')
@@ -262,6 +333,16 @@ def concatenate():
 				slider3 = request.form.get('slider3')
 				concatenated = str(slider1) + str(slider2) + str(slider3)
 				return concatenated
+
+
+
+@app.route('/error')
+@app.route('/page-not-found')
+def error():
+		raise Exception("Error!")
+		return render_template("error.html")
+
+
 
 
 # In[4]: run app

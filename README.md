@@ -42,5 +42,22 @@ song id:
 
 artist id: 
 0f3EsoviYnRKTkmayI3cux (men at work)
+26dSoYclwsYLMAKD3tpOr4 (britney spears)
 
 
+## feature planning
+### MVP
+[x] on playlist view, clicking a song loads song page for that song
+[x] on album view, clicking a song loads song page for that song
+[] on artist view, top songs, albums and album songs are shown
+[] on artist view, clicking a song loads song page for that song, clicking an album loads album page for that album
+[] on recommendation sandbox, users can select ranges for song characteristics and be shown a playlist fitting criteria
+
+### reach goals
+[] verify we get all items at all locations (ie get all paginated results)
+[] when playlist is loaded and a song does not have preview url, grey it out or change the opacity
+[] on all playlists/artist view, hovering over album/playlist will play top popularity song from that album/playlist
+[] user can filter their liked songs based on characteristic criteria and create playlist for that
+[] recommendation criteria filters should be double sliders (user can select a range)
+[] make mobile app
+[] mobile experience should be like in-app previews/YT shorts/tiktok
