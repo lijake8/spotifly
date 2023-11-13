@@ -36,13 +36,13 @@
       {% for album_id, album in album_info.items() %}
         <h4>{{album['album_name']}}, {{album['year']}}. Popularity: {{album['popularity']}}</h4>
 
-         <!-- container for tracks in album -->
-        <div class='grid gap-2 grid-cols-10 mt-5 pl-5 pr-5 border-2 border-yellow-300'>
+         <!-- container for tracks -->
+        <div class='grid gap-1 grid-cols-10 mt-5 pl-5 pr-5 border-2 border-yellow-300'>
           {% for track in album['tracks'] %}
           
           <!-- container for individual track -->
           <a href="{{ url_for('song_view', track_id=track['id']) }}">
-            <div class="hoverElement border-2 border-purple-500 relative h-full" data-audio-url="{{track['preview_url']}}" data-track-name="{{track['name']}}">
+            <div class="hoverElement relative h-full" data-audio-url="{{track['preview_url']}}" data-track-name="{{track['name']}}">
               <audio></audio>
               <img src="{{album['album_image_url']}}" alt="album cover" class="w-full h-full object-cover">
               <h6 class="hoverElementText absolute inset-0 flex items-center text-center justify-center"></h6>
@@ -55,13 +55,17 @@
       <h3>Compilations</h3>
       {% for album_id, album in compilation_info.items() %}
         <h4>{{album['album_name']}}, {{album['year']}}. Popularity: {{album['popularity']}}</h4>
-        <div class='grid gap-8 grid-cols-3 mt-5 pl-5 pr-5 border-2 border-yellow-300'>
+
+         <!-- container for tracks -->
+        <div class='grid gap-1 grid-cols-10 mt-5 pl-5 pr-5 border-2 border-yellow-300'>
           {% for track in album['tracks'] %}
+          
+          <!-- container for individual track -->
           <a href="{{ url_for('song_view', track_id=track['id']) }}">
-            <div class="hoverElement border-2 border-purple-500" data-audio-url="{{track['preview_url']}}">
+            <div class="hoverElement relative h-full" data-audio-url="{{track['preview_url']}}" data-track-name="{{track['name']}}">
               <audio></audio>
-              <img src="{{album['album_image_url']}}" class="h-10 w-10" alt="album cover">
-              <p>{{track['name']}}</p>
+              <img src="{{album['album_image_url']}}" alt="album cover" class="w-full h-full object-cover">
+              <h6 class="hoverElementText absolute inset-0 flex items-center text-center justify-center"></h6>
             </div>
           </a>
           {% endfor %}
@@ -71,13 +75,17 @@
       <h3>Singles</h3>
       {% for album_id, album in single_info.items() %}
         <h4>{{album['album_name']}}, {{album['year']}}. Popularity: {{album['popularity']}}</h4>
-        <div class='grid gap-8 grid-cols-3 mt-5 pl-5 pr-5 border-2 border-yellow-300'>
+
+         <!-- container for tracks -->
+        <div class='grid gap-1 grid-cols-10 mt-5 pl-5 pr-5 border-2 border-yellow-300'>
           {% for track in album['tracks'] %}
+          
+          <!-- container for individual track -->
           <a href="{{ url_for('song_view', track_id=track['id']) }}">
-            <div class="hoverElement border-2 border-purple-500" data-audio-url="{{track['preview_url']}}">
+            <div class="hoverElement relative h-full" data-audio-url="{{track['preview_url']}}" data-track-name="{{track['name']}}">
               <audio></audio>
-              <img src="{{album['album_image_url']}}" class="h-10 w-10" alt="album cover">
-              <p>{{track['name']}}</p>
+              <img src="{{album['album_image_url']}}" alt="album cover" class="w-full h-full object-cover">
+              <h6 class="hoverElementText absolute inset-0 flex items-center text-center justify-center"></h6>
             </div>
           </a>
           {% endfor %}

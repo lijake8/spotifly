@@ -429,20 +429,20 @@ h1 {
 }
 
 h2 {
-  font-size: 1.25rem;
-  line-height: 1.75rem;
+  font-size: 1.875rem;
+  line-height: 2.25rem;
   font-weight: 700;
 }
 
 h3 {
-  font-size: 1.125rem;
-  line-height: 1.75rem;
+  font-size: 1.5rem;
+  line-height: 2rem;
   font-weight: 600;
 }
 
 h4 {
-  font-size: 1rem;
-  line-height: 1.5rem;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
   font-weight: 600;
 }
 
@@ -731,8 +731,8 @@ h6 {
   justify-content: center;
 }
 
-.gap-2 {
-  gap: 0.5rem;
+.gap-1 {
+  gap: 0.25rem;
 }
 
 .gap-8 {
