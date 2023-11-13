@@ -5,8 +5,8 @@
 /* add common styles for commonly used headers */
 @layer base {
   h1 {
-    @apply text-2xl;
-    @apply font-extrabold;
+    @apply text-5xl;
+    @apply font-bold;
   }
   h2 {
     @apply text-xl;
@@ -19,5 +19,25 @@
   h4 {
     @apply text-base;
     @apply font-semibold;
+  }
+  /* h6 used for overlay text on album covers */
+  h6 {
+    /* white font with black border */
+    @apply font-bold;
+    @apply text-lg;
+    @apply text-white text-stroke-black;
+    /* center text */
+    /* @apply text-center; */
+    /* position text at bottom of div */
+    /* @apply absolute; */
+    /* @apply bottom-0; */
+    /* @apply w-full; */
+    /* add padding to bottom of text */
+    /* @apply pb-2; */
+  }
+
+  .text-stroke-black {
+    -webkit-text-stroke-width: 1px; /* Adjust the width as needed */
+    -webkit-text-stroke-color: #000; /* Black outline color */
   }
 }
