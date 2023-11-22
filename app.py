@@ -66,6 +66,15 @@ def index():
 		# Step 3. Signed in, display data
 		spotify = spotipy.Spotify(auth_manager=auth_manager)
 		user = spotify.me()
+
+		# get liked songs and save to session
+		track_results = spotify.current_user_saved_tracks(limit=50, offset=0)
+		tracks = track_results['items']
+		while track_results['next']:
+				track_results = spotify.next(track_results)
+				tracks.extend(track_results['items'])
+		session['liked_songs'] = [track['track']['name'] for track in tracks]
+
 		return render_template('user.html', user=user)
 	
 
@@ -160,22 +169,16 @@ def playlist_view(playlist_id):
 
 @app.route('/my-songs')
 def my_songs():
-	spotify = setup_api_client()
+	# get liked songs from session
+	liked_songs = session.get('liked_songs', [])
+	return liked_songs
 
-	results = spotify.current_user_saved_tracks(limit=50, offset=0)
-	tracks = results['items']
-	while results['next']:
-			results = spotify.next(results)
-			tracks.extend(results['items'])
 
-	print(len(tracks))
-	return [track['track']['name'] for track in tracks]
-	# return render_template('playlist.html', tracks=tracks)
 
 
 @app.route('/artist-view/<artist_id>')
 def artist_view(artist_id):
-	spotify = setup_api_client()
+	# spotify = setup_api_client()
 
 	# artist = spotify.artist(artist_id)
 	# followers_str = str(round(artist['followers']['total']/1000000, 1)) + 'M' if artist['followers']['total'] > 1000000 else str(round(artist['followers']['total']/1000, 1)) + 'K' if artist['followers']['total'] > 1000 else '<1K'

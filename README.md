@@ -52,6 +52,7 @@ artist id:
 [] on artist view, top songs, albums and album songs are shown
 [] on artist view, clicking a song loads song page for that song, clicking an album loads album page for that album
 [] on recommendation sandbox, users can select ranges for song characteristics and be shown a playlist fitting criteria
+[] liked songs should be searched once on login and state persisted within the session
 
 ### reach goals
 [] verify we get all items at all locations (ie get all paginated results)
