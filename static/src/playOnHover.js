@@ -1,3 +1,7 @@
+// Load module from Skypack CDN
+import AudioMotionAnalyzer from "https://cdn.skypack.dev/audiomotion-analyzer?min";
+// https://www.npmjs.com/package/audiomotion-analyzer#disconnectinput-node-stoptracks-
+
 // Get all elements with the class 'hoverElement'
 const hoverElements = document.getElementsByClassName('hoverElement');
 
@@ -6,6 +10,36 @@ const currentHoverTrackName = document.getElementById('currentHoverTrackName');
 
 // Get the element that displays the currently playing track image
 const currentHoverTrackImage = document.getElementById('currentHoverTrackImage');
+
+//get the right bar
+const rightBar = document.getElementById('rightBar');
+
+
+
+
+// Create an AudioContext
+const audioContext = new AudioContext();
+const audioElements = document.getElementsByTagName('audio');
+const audioMotion = new AudioMotionAnalyzer(
+    document.getElementById("visualizer"),
+    {
+      source: audioElements[0], //random placeholder
+      height: 100,
+      ansiBands: false,
+      showScaleX: false,
+      bgAlpha: 0,
+      overlay: true,
+      mode: 6,
+      frequencyScale: "log",
+      showPeaks: false,
+      smoothing: 0.5, //0-1. higher is more smoothing
+      ledBars: true,
+      gradient: "prism",
+    }
+  );
+
+
+
 
 // Add event listeners to each hover element
 Array.from(hoverElements).forEach((element) => {
@@ -20,6 +54,7 @@ Array.from(hoverElements).forEach((element) => {
 
     // when the user hovers over the element, play audio and display track name and change the opacity
     element.addEventListener('mouseenter', () => {
+        console.log('hovered')
         audioPlayer.src = audioSourceUrl;
         audioPlayer.play();
 
@@ -35,9 +70,15 @@ Array.from(hoverElements).forEach((element) => {
         // update currently playing track image
         currentHoverTrackImage.src = albumImg;
         currentHoverTrackImage.style.display='block';
+
+        // update visualizer to current audio element
+        // console.log(audioMotion);
+        audioMotion.connectInput(audioPlayer);
+        
     });
 
     element.addEventListener('mouseleave', () => {
+        console.log('left')
         audioPlayer.pause();
         audioPlayer.src = '';
 
@@ -51,8 +92,16 @@ Array.from(hoverElements).forEach((element) => {
         currentHoverTrackName.textContent = '';
 
         // Reset currently playing track image
-        currentHoverTrackImage.src = '';
-        currentHoverTrackImage.style.display='none';
+        currentHoverTrackImage.src = ''; //TODO: change to blank white image to avoid halo effect of visualizer
+        currentHoverTrackImage.style.display='none'; //TODO: remove if necessary when changing to blank image
+
+
+
+
+
+
+
+        
     });
 
 });

@@ -27,13 +27,14 @@ document.getElementById('pause-button').addEventListener('click', () => {
 const audioContext = new AudioContext();
 // Get the audio element
 const audioElements = document.getElementsByTagName('audio');
+// console.log(audioElements[0]);
 
 
 const audioMotion = new AudioMotionAnalyzer(
   document.getElementById("visualizer"),
   {
     source: audioElements[0],
-    height: 400,
+    height: 600,
     ansiBands: false,
     showScaleX: false,
     bgAlpha: 0,

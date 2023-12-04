@@ -627,6 +627,38 @@ h6 {
   top: 0px;
 }
 
+.top-0 {
+  top: 0px;
+}
+
+.bottom-0 {
+  bottom: 0px;
+}
+
+.z-\[1\] {
+  z-index: 1;
+}
+
+.z-\[2\] {
+  z-index: 2;
+}
+
+.z-\[3\] {
+  z-index: 3;
+}
+
+.z-10 {
+  z-index: 10;
+}
+
+.z-20 {
+  z-index: 20;
+}
+
+.z-30 {
+  z-index: 30;
+}
+
 .m-0 {
   margin: 0px;
 }
@@ -691,6 +723,10 @@ h6 {
   height: 50%;
 }
 
+.h-1\/5 {
+  height: 20%;
+}
+
 .max-h-52 {
   max-height: 13rem;
 }
@@ -729,6 +765,11 @@ h6 {
 
 .w-1\/2 {
   width: 50%;
+}
+
+.w-max {
+  width: -moz-max-content;
+  width: max-content;
 }
 
 .transform {
