@@ -34,6 +34,7 @@ Array.from(hoverElements).forEach((element) => {
 
         // update currently playing track image
         currentHoverTrackImage.src = albumImg;
+        currentHoverTrackImage.style.display='block';
     });
 
     element.addEventListener('mouseleave', () => {
@@ -51,8 +52,10 @@ Array.from(hoverElements).forEach((element) => {
 
         // Reset currently playing track image
         currentHoverTrackImage.src = '';
+        currentHoverTrackImage.style.display='none';
     });
 
 });
+
 
 

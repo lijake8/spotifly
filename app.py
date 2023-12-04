@@ -354,6 +354,11 @@ def error():
 		return render_template("error.html")
 
 
+@app.route('/test-visualizer')
+def test_visualizer():
+		return render_template("test-visualizer.html")
+
+
 
 
 # In[4]: run app

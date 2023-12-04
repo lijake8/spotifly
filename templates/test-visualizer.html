@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>page for testing js visualizer</title>
+    <link
+      rel="stylesheet"
+      href="{{url_for('static',filename='dist/output.css')}}"
+    />
+    
+  </head>
+  <body>
+    
+    <!-- <a href="#">
+      <div class="hoverElement relative h-full" data-audio-url="https://p.scdn.co/mp3-preview/acf532e9831bc2dd5e5f3a6c0e92e1ed6d55beb7?cid=9688e06282ff4043a95d46dee1f7467d" data-track-name="track name here" data-album-img="https://i.scdn.co/image/ab67616d0000b273aa22899360d8ba6704732dec">
+        <audio id="audio"></audio>
+        <img src="https://i.scdn.co/image/ab67616d0000b273aa22899360d8ba6704732dec" alt="album cover" class="h-full object-cover">
+        <h6 class="hoverElementText absolute inset-0 flex items-center text-center justify-center"></h6>
+      </div>
+    </a> -->
+
+    
+    <!-- https://codepen.io/adityakrshnn/pen/abQvNBp -->
+    <button id="play-button">Play Audio</button>
+    <button id="pause-button">Pause Audio</button>
+    
+    <div class="container border-2 border-red-500 h-1/2 w-1/2" id="visualizer"></div>
+    <audio crossorigin="anonymous" src="https://p.scdn.co/mp3-preview/acf532e9831bc2dd5e5f3a6c0e92e1ed6d55beb7?cid=9688e06282ff4043a95d46dee1f7467d"></audio>
+
+
+
+
+    <script src="{{ url_for('static', filename='src/playOnHoverVisualizerTest.js') }}" type="module"></script>
+  </body>
+</html>

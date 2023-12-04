@@ -655,6 +655,10 @@ h6 {
   margin-top: 1.25rem;
 }
 
+.block {
+  display: block;
+}
+
 .flex {
   display: flex;
 }
@@ -677,6 +681,14 @@ h6 {
 
 .h-full {
   height: 100%;
+}
+
+.h-1\/4 {
+  height: 25%;
+}
+
+.h-1\/2 {
+  height: 50%;
 }
 
 .max-h-52 {
@@ -713,6 +725,10 @@ h6 {
 
 .w-full {
   width: 100%;
+}
+
+.w-1\/2 {
+  width: 50%;
 }
 
 .transform {
@@ -851,6 +867,10 @@ h6 {
      object-fit: cover;
 }
 
+.p-4 {
+  padding: 1rem;
+}
+
 .p-5 {
   padding: 1.25rem;
 }
@@ -889,8 +909,16 @@ h6 {
   padding-bottom: 1rem;
 }
 
+.pl-4 {
+  padding-left: 1rem;
+}
+
 .pl-5 {
   padding-left: 1.25rem;
+}
+
+.pr-4 {
+  padding-right: 1rem;
 }
 
 .pr-5 {
