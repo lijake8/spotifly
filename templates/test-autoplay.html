@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sequential Audio Player</title>
+</head>
+<body>
+
+<h1>Sequential Audio Player</h1>
+
+<button id="playButton">Play All</button>
+
+<ul id="audioList">
+<li><audio src="../static/cropped-audio-samples/1.mp3" controls></audio></li>
+<li><audio src="../static/cropped-audio-samples/2.mp3" controls></audio></li>
+<li><audio src="../static/cropped-audio-samples/3.mp3" controls></audio></li>
+<!-- Add more audio elements as needed -->
+</ul>
+
+<script>
+    //fade in and fade out working
+    document.addEventListener('DOMContentLoaded', function() {
+        const audioList = document.getElementById('audioList');
+        const playButton = document.getElementById('playButton');
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const gainNode = audioContext.createGain();
+        let currentIndex = 0;
+
+        // Connect the gain node to the audio context
+        gainNode.connect(audioContext.destination);
+
+        playButton.addEventListener('click', function() {
+            playSequentially();
+        });
+
+        function playSequentially() {
+            const audioElements = audioList.querySelectorAll('audio');
+
+            if (currentIndex < audioElements.length) {
+                const source = audioContext.createMediaElementSource(audioElements[currentIndex]);
+                source.connect(gainNode);
+
+                const fadeTime = 0.75;
+
+                // fade in
+                // Start with a zero gain
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                // Ramp up the gain to 1 over 1 second (adjust as needed)
+                gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + fadeTime);
+
+                // fade out
+                gainNode.gain.setValueAtTime(1, audioContext.currentTime + audioElements[currentIndex].duration - fadeTime);
+                gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + audioElements[currentIndex].duration);
+
+
+                audioElements[currentIndex].play();
+
+                // Increment the index for the next play
+                currentIndex++;
+
+                // Schedule the next audio to play after the current one finishes
+                audioElements[currentIndex - 1].onended = function() {
+                    // Delay the next audio play to ensure smooth transition
+                    setTimeout(playSequentially, 0); //!!!used to be 50
+                };
+            } else {
+                // Reset the index for the next play
+                currentIndex = 0;
+            }
+        }
+    });
+
+</script>
+
+</body>
+</html>

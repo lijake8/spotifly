@@ -29,14 +29,30 @@ const audioMotion = new AudioMotionAnalyzer(
       showScaleX: false,
       bgAlpha: 0,
       overlay: true,
-      mode: 6,
+      mode: 7,
       frequencyScale: "log",
       showPeaks: false,
-      smoothing: 0.5, //0-1. higher is more smoothing
+      smoothing: 0.8, //0-1. higher is more smoothing
       ledBars: true,
       gradient: "prism",
     }
-  );
+);
+audioMotion.setLedParams(
+  {
+    maxLeds: 15, // integer, > 0
+    spaceV: 0.5,    // > 0
+    spaceH: 0    // >= 0
+  }
+);
+audioMotion.registerGradient( 'prism', {
+  bgColor: '#011a35', // background color (optional) - defaults to '#111'
+  dir: 'v',           // add this property to create a horizontal gradient (optional)
+  colorStops: [       // list your gradient colors in this array (at least one color is required)
+    { color: 'white'},
+    { color: 'gray'}, // pos is a value between 0.0 and 1.0
+  ]
+});
+
 
 
 
@@ -92,15 +108,8 @@ Array.from(hoverElements).forEach((element) => {
         currentHoverTrackName.textContent = '';
 
         // Reset currently playing track image
-        currentHoverTrackImage.src = ''; //TODO: change to blank white image to avoid halo effect of visualizer
-        currentHoverTrackImage.style.display='none'; //TODO: remove if necessary when changing to blank image
-
-
-
-
-
-
-
+        currentHoverTrackImage.src = '../static/images/blank.jpg'
+        // currentHoverTrackImage.style.display='none'; //TODO: remove if necessary when changing to blank image
         
     });
 

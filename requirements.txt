@@ -2,3 +2,5 @@ flask
 flask_session
 python-dotenv
 spotipy
+Pillow
+colorthief

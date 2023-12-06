@@ -358,6 +358,16 @@ def error():
 def test_visualizer():
 		return render_template("test-visualizer.html")
 
+@app.route('/test-autoplay')
+def test_autoplay():
+		song_urls = [
+        'https://p.scdn.co/mp3-preview/4d9bde799eec8913e53c184c45b9fd575690b917?cid=9688e06282ff4043a95d46dee1f7467d',
+        'https://p.scdn.co/mp3-preview/337c8d45ac66899bc2db9ef3ed9438fe1d035ab1?cid=9688e06282ff4043a95d46dee1f7467d',
+        'https://p.scdn.co/mp3-preview/547de9accd9a23cb808f2497c5512151ed12baa4?cid=9688e06282ff4043a95d46dee1f7467d'
+    ]
+		data = {'song_urls': song_urls}
+		return render_template("test-autoplay.html", data=data)
+
 
 
 

@@ -5,7 +5,7 @@ env/scripts/activate
 ## to run the app
 https://flowbite.com/docs/getting-started/flask/
 need split terminal
-  python app.py
+  python app.py --debug
   npx tailwindcss -i ./static/src/input.css -o ./static/dist/output.css --watch
   ^applies the input tailwind css settings to create an output css file with all the classnames
 
