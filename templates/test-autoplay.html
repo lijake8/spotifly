@@ -1,37 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sequential Audio Player</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sequential Audio Player</title>
 </head>
 <body>
 
 <h1>Sequential Audio Player</h1>
 
 <button id="playButton">Play All</button>
+<button id="pauseButton">Pause</button>
+<button id="skipButton">Skip</button>
 
 <ul id="audioList">
-<li><audio src="../static/cropped-audio-samples/1.mp3" controls></audio></li>
-<li><audio src="../static/cropped-audio-samples/2.mp3" controls></audio></li>
-<li><audio src="../static/cropped-audio-samples/3.mp3" controls></audio></li>
-<!-- Add more audio elements as needed -->
+    <li><audio src="../static/cropped-audio-samples/1.mp3" controls></audio></li>
+    <li><audio src="../static/cropped-audio-samples/2.mp3" controls></audio></li>
+    <li><audio src="../static/cropped-audio-samples/3.mp3" controls></audio></li>
+    <li><audio src="../static/cropped-audio-samples/4.mp3" controls></audio></li>
+    <li><audio src="../static/cropped-audio-samples/5.mp3" controls></audio></li>
+    <li><audio src="../static/cropped-audio-samples/6.mp3" controls></audio></li>
 </ul>
 
 <script>
-    //fade in and fade out working
     document.addEventListener('DOMContentLoaded', function() {
         const audioList = document.getElementById('audioList');
         const playButton = document.getElementById('playButton');
+        const pauseButton = document.getElementById('pauseButton');
+        const skipButton = document.getElementById('skipButton');
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         const gainNode = audioContext.createGain();
         let currentIndex = 0;
+        let isPaused = false; // Track pause state
 
         // Connect the gain node to the audio context
         gainNode.connect(audioContext.destination);
 
         playButton.addEventListener('click', function() {
             playSequentially();
+        });
+
+        pauseButton.addEventListener('click', function() {
+            // Pause the Web Audio API context and set the pause state
+            audioContext.suspend();
+            isPaused = true;
+        });
+
+        skipButton.addEventListener('click', function() {
+            // If the "Skip" button is pressed, pause the current audio, reset its time, and move to the next track
+            const audioElements = audioList.querySelectorAll('audio');
+            if (currentIndex < audioElements.length) {
+                // If the audio is playing, pause it
+                if (!audioElements[currentIndex].paused) {
+                    audioElements[currentIndex].pause();
+                }
+
+                // Increment the index
+                // audioElements[currentIndex].currentTime is time that passed on current track before pressing skip
+                currentIndex++;
+
+                // cancel future gainnode events
+                gainNode.gain.cancelScheduledValues(audioContext.currentTime);
+
+                playSequentially();
+            }
         });
 
         function playSequentially() {
@@ -43,26 +75,30 @@
 
                 const fadeTime = 0.75;
 
+                console.log('audiocontext time', audioContext.currentTime);
                 // fade in
                 // Start with a zero gain
                 gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-                // Ramp up the gain to 1 over 1 second (adjust as needed)
                 gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + fadeTime);
 
                 // fade out
                 gainNode.gain.setValueAtTime(1, audioContext.currentTime + audioElements[currentIndex].duration - fadeTime);
                 gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + audioElements[currentIndex].duration);
 
+                // Resume the Web Audio API context if it was paused
+                if (isPaused) {
+                    audioContext.resume();
+                    isPaused = false;
+                }
 
                 audioElements[currentIndex].play();
 
-                // Increment the index for the next play
-                currentIndex++;
-
                 // Schedule the next audio to play after the current one finishes
-                audioElements[currentIndex - 1].onended = function() {
-                    // Delay the next audio play to ensure smooth transition
-                    setTimeout(playSequentially, 0); //!!!used to be 50
+                audioElements[currentIndex].onended = function() {
+                    currentIndex++;
+
+                    // Delay the next audio play to ensure a smooth transition
+                    setTimeout(playSequentially, 0); //was 500
                 };
             } else {
                 // Reset the index for the next play
@@ -70,7 +106,6 @@
             }
         }
     });
-
 </script>
 
 </body>
