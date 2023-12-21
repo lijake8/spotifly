@@ -35,17 +35,23 @@
 
         // Connect the gain node to the audio context
         gainNode.connect(audioContext.destination);
+        console.log('gainNode connected', gainNode);
 
+        // play button starts playing sequentially
         playButton.addEventListener('click', function() {
+            audioContext.suspend();
+            isPaused = true;
             playSequentially();
         });
 
+        // pause button pauses the audio context
         pauseButton.addEventListener('click', function() {
             // Pause the Web Audio API context and set the pause state
             audioContext.suspend();
             isPaused = true;
         });
 
+        // skip button skips to the next track
         skipButton.addEventListener('click', function() {
             // If the "Skip" button is pressed, pause the current audio, reset its time, and move to the next track
             const audioElements = audioList.querySelectorAll('audio');
@@ -67,6 +73,7 @@
         });
 
         function playSequentially() {
+            console.log('called playSequentially')
             const audioElements = audioList.querySelectorAll('audio');
 
             if (currentIndex < audioElements.length) {

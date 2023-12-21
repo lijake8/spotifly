@@ -35,7 +35,6 @@
     
         <div class="grid gap-8 grid-cols-1 border-2 border-red-500 p-5">
           <h2>Discography</h2>
-
           <h3>Albums</h3>
           {% for album_id, album in album_info.items() %}
             <h4>{{album['album_name']}}, {{album['year']}}. Popularity: {{album['popularity']}}</h4>
