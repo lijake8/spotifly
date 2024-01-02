@@ -27,10 +27,32 @@
       <div class="w-2/3 border-purple-900 border-2">
         <div class="grid gap-8 grid-cols-1 border-2 border-emerald-300 p-5">
           <h2>Liked Songs</h2>
+          <div class='grid gap-1 grid-cols-7 border-2 border-yellow-300'>
+            {% for track in liked_tracks %}
+              <a href="{{ url_for('song_view', track_id=track['id']) }}">
+                <div class="hoverElement relative h-full" data-audio-url="{{track['preview_url']}}" data-track-name="{{track['name']}}" data-album-img="{{track['album_image_url']}}">
+                  <audio crossorigin="anonymous" id="audio"></audio>
+                  <img src="{{track['album_image_url']}}" alt="album cover" class="w-full h-full object-cover">
+                  <h6 class="hoverElementText absolute inset-0 flex items-center text-center justify-center"></h6>
+                </div>
+              </a>
+            {% endfor %}
+          </div>
         </div>
     
         <div class="grid gap-8 grid-cols-1 border-2 border-fuchsia-500 p-5">
           <h2>Top Songs</h2>
+          <div class='grid gap-1 grid-cols-7 border-2 border-yellow-300'>
+            {% for track in top_tracks %}
+              <a href="{{ url_for('song_view', track_id=track['id']) }}">
+                <div class="hoverElement relative h-full" data-audio-url="{{track['preview_url']}}" data-track-name="{{track['name']}}" data-album-img="{{track['album_image_url']}}">
+                  <audio crossorigin="anonymous" id="audio"></audio>
+                  <img src="{{track['album_image_url']}}" alt="album cover" class="w-full h-full object-cover">
+                  <h6 class="hoverElementText absolute inset-0 flex items-center text-center justify-center"></h6>
+                </div>
+              </a>
+            {% endfor %}
+          </div>
         </div>
     
         <div class="grid gap-8 grid-cols-1 border-2 border-red-500 p-5">

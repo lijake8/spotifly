@@ -73,7 +73,33 @@ def index():
 		while track_results['next']:
 				track_results = spotify.next(track_results)
 				tracks.extend(track_results['items'])
-		session['liked_songs'] = [track['track']['name'] for track in tracks]
+		session['liked_songs'] = [track['track'] for track in tracks]
+
+
+		# cache saved (liked) tracks for each artist
+		# from liked songs, make a map of (artist id: [{track id, track name, track preview url, track image url}, ]) 
+		artist_track_map = {}
+		for track in tracks:
+			artist_id = track['track']['artists'][0]['id']
+			if artist_id in artist_track_map:
+				artist_track_map[artist_id].append({
+					'id': track['track']['id'],
+					'name': track['track']['name'],
+					'preview_url': track['track']['preview_url'],
+					'album_image_url': track['track']['album']['images'][0]['url'] if len(track['track']['album']['images']) > 0 else 'https://www.freeiconspng.com/uploads/spotify-icon-2.png'
+				})
+			else:
+				artist_track_map[artist_id] = [{
+					'id': track['track']['id'],
+					'name': track['track']['name'],
+					'preview_url': track['track']['preview_url'],
+					'album_image_url': track['track']['album']['images'][0]['url'] if len(track['track']['album']['images']) > 0 else 'https://www.freeiconspng.com/uploads/spotify-icon-2.png'
+				}]
+		session['artist_track_map'] = artist_track_map
+
+		# map of artist id to artist info to load that artist's page faster
+		session['artist_info'] = {}
+
 
 		return render_template('user.html', user=user)
 	
@@ -178,103 +204,129 @@ def my_songs():
 
 @app.route('/artist-view/<artist_id>')
 def artist_view(artist_id):
-	# spotify = setup_api_client()
+	if artist_id in session['artist_info']:
+		artist_info = session['artist_info'][artist_id]
+		return render_template('artist.html', artist_image_url=artist_info['artist_image_url'], artist_name=artist_info['artist_name'], followers=artist_info['followers'], album_info=artist_info['album_info'], liked_tracks=artist_info['liked_tracks'], top_tracks=artist_info['top_tracks'], single_info=artist_info['single_info'], compilation_info=artist_info['compilation_info'])
+	else:
+		spotify = setup_api_client()
 
-	# artist = spotify.artist(artist_id)
-	# followers_str = str(round(artist['followers']['total']/1000000, 1)) + 'M' if artist['followers']['total'] > 1000000 else str(round(artist['followers']['total']/1000, 1)) + 'K' if artist['followers']['total'] > 1000 else '<1K'
-	# artist_image_url = artist['images'][0]['url'] if len(artist['images']) > 0 else 'https://www.freeiconspng.com/uploads/spotify-icon-2.png'
-	# artist_name = artist['name']
+		artist = spotify.artist(artist_id)
+		followers_str = str(round(artist['followers']['total']/1000000, 1)) + 'M' if artist['followers']['total'] > 1000000 else str(round(artist['followers']['total']/1000, 1)) + 'K' if artist['followers']['total'] > 1000 else '<1K'
+		artist_image_url = artist['images'][0]['url'] if len(artist['images']) > 0 else 'https://www.freeiconspng.com/uploads/spotify-icon-2.png'
+		artist_name = artist['name']
 
-	# albums = spotify.artist_albums(artist_id, limit=50)
-	# album_list = albums['items'] #list of SimplifiedAlbumObjects
-	# while albums['next']:
-	# 		albums = spotify.next(albums)
-	# 		album_list.extend(albums['items'])
+		albums = spotify.artist_albums(artist_id, limit=50)
+		album_list = albums['items'] #list of SimplifiedAlbumObjects
+		while albums['next']:
+				albums = spotify.next(albums)
+				album_list.extend(albums['items'])
 
-	# # if album is not primarily by this artist, ignore it
-	# album_list = [album for album in album_list if album['artists'][0]['id'] == artist_id]
+		# if album is not primarily by this artist, ignore it
+		album_list = [album for album in album_list if album['artists'][0]['id'] == artist_id]
 
-	# album_ids = [album['id'] for album in album_list] #get album ids to get tracks
-	
-	# # get detailed album info from albums 20 at a time
-	# detailed_albums = [] # list of AlbumObjects
-	# for i in range(0, len(album_ids), 20):
-	# 		detailed_albums.extend(spotify.albums(album_ids[i:i+20])['albums'])
-
+		album_ids = [album['id'] for album in album_list] #get album ids to get tracks
 		
-	
-	# album_info = {} # map of album id: {album image url:, album name:, album release date:, album total tracks:, popularity:, year:, tracks: [{name:, preview url:, id:}, ...]}
-	# single_info = {}
-	# compilation_info = {}
-	# for album in detailed_albums:
-	# 	if album['album_type'] == 'single':
-	# 		single_info[album['id']] = {
-	# 			'album_image_url': album['images'][0]['url'] if len(album['images']) > 0 else 'https://www.freeiconspng.com/uploads/spotify-icon-2.png',
-	# 			'album_name': album['name'],
-	# 			'album_release_date': album['release_date'],
-	# 			'album_total_tracks': album['total_tracks'],
-	# 			'popularity': album['popularity'],
-	# 			'year': album['release_date'][:4], #first 4 chars of release date is the year
-	# 			'tracks': []
-	# 		}
-	# 		for track in album['tracks']['items']:
-	# 			single_info[album['id']]['tracks'].append({
-	# 				'name': track['name'],
-	# 				'preview_url': track['preview_url'],
-	# 				'id': track['id']
-	# 			})
-	# 	elif album['album_type'] == 'compilation':
-	# 		compilation_info[album['id']] = {
-	# 			'album_image_url': album['images'][0]['url'] if len(album['images']) > 0 else 'https://www.freeiconspng.com/uploads/spotify-icon-2.png',
-	# 			'album_name': album['name'],
-	# 			'album_release_date': album['release_date'],
-	# 			'album_total_tracks': album['total_tracks'],
-	# 			'popularity': album['popularity'],
-	# 			'year': album['release_date'][:4], #first 4 chars of release date is the year
-	# 			'tracks': []
-	# 		}
-	# 		for track in album['tracks']['items']:
-	# 			compilation_info[album['id']]['tracks'].append({
-	# 				'name': track['name'],
-	# 				'preview_url': track['preview_url'],
-	# 				'id': track['id']
-	# 			})
-	# 	else:
-	# 		album_info[album['id']] = {
-	# 			'album_image_url': album['images'][0]['url'] if len(album['images']) > 0 else 'https://www.freeiconspng.com/uploads/spotify-icon-2.png',
-	# 			'album_name': album['name'],
-	# 			'album_release_date': album['release_date'],
-	# 			'album_total_tracks': album['total_tracks'],
-	# 			'popularity': album['popularity'],
-	# 			'year': album['release_date'][:4], #first 4 chars of release date is the year
-	# 			'tracks': []
-	# 		}
-	# 		for track in album['tracks']['items']:
-	# 			album_info[album['id']]['tracks'].append({
-	# 				'name': track['name'],
-	# 				'preview_url': track['preview_url'],
-	# 				'id': track['id']
-	# 			})
+		# get detailed album info from albums 20 at a time
+		detailed_albums = [] # list of AlbumObjects
+		for i in range(0, len(album_ids), 20):
+				detailed_albums.extend(spotify.albums(album_ids[i:i+20])['albums'])
+
+			
 		
+		album_info = {} # map of album id: {album image url:, album name:, album release date:, album total tracks:, popularity:, year:, tracks: [{name:, preview url:, id:}, ...]}
+		single_info = {}
+		compilation_info = {}
+		for album in detailed_albums:
+			if album['album_type'] == 'single':
+				single_info[album['id']] = {
+					'album_image_url': album['images'][0]['url'] if len(album['images']) > 0 else 'https://www.freeiconspng.com/uploads/spotify-icon-2.png',
+					'album_name': album['name'],
+					'album_release_date': album['release_date'],
+					'album_total_tracks': album['total_tracks'],
+					'popularity': album['popularity'],
+					'year': album['release_date'][:4], #first 4 chars of release date is the year
+					'tracks': []
+				}
+				for track in album['tracks']['items']:
+					single_info[album['id']]['tracks'].append({
+						'name': track['name'],
+						'preview_url': track['preview_url'],
+						'id': track['id']
+					})
+			elif album['album_type'] == 'compilation':
+				compilation_info[album['id']] = {
+					'album_image_url': album['images'][0]['url'] if len(album['images']) > 0 else 'https://www.freeiconspng.com/uploads/spotify-icon-2.png',
+					'album_name': album['name'],
+					'album_release_date': album['release_date'],
+					'album_total_tracks': album['total_tracks'],
+					'popularity': album['popularity'],
+					'year': album['release_date'][:4], #first 4 chars of release date is the year
+					'tracks': []
+				}
+				for track in album['tracks']['items']:
+					compilation_info[album['id']]['tracks'].append({
+						'name': track['name'],
+						'preview_url': track['preview_url'],
+						'id': track['id']
+					})
+			else:
+				album_info[album['id']] = {
+					'album_image_url': album['images'][0]['url'] if len(album['images']) > 0 else 'https://www.freeiconspng.com/uploads/spotify-icon-2.png',
+					'album_name': album['name'],
+					'album_release_date': album['release_date'],
+					'album_total_tracks': album['total_tracks'],
+					'popularity': album['popularity'],
+					'year': album['release_date'][:4], #first 4 chars of release date is the year
+					'tracks': []
+				}
+				for track in album['tracks']['items']:
+					album_info[album['id']]['tracks'].append({
+						'name': track['name'],
+						'preview_url': track['preview_url'],
+						'id': track['id']
+					})
+			
+		# get user liked songs for this artist
+		if artist_id in session['artist_track_map']:
+			liked_tracks = session['artist_track_map'][artist_id]
+
+		# get top tracks for this artist
+		top_tracks_res = spotify.artist_top_tracks(artist_id)['tracks']
+		print('top tracks', top_tracks_res)
+		top_tracks = []
+		for track in top_tracks_res:
+			top_tracks.append({
+				'name': track['name'],
+				'preview_url': track['preview_url'],
+				'id': track['id'],
+				'album_image_url': track['album']['images'][0]['url'] if len(track['album']['images']) > 0 else 'https://www.freeiconspng.com/uploads/spotify-icon-2.png'
+			})
+
+		artist_info = {
+			'artist_image_url': artist_image_url,
+			'artist_name': artist_name,
+			'followers': followers_str,
+			'album_info': album_info,
+			'liked_tracks': liked_tracks,
+			'top_tracks': top_tracks,
+			'single_info': single_info,
+			'compilation_info': compilation_info
+		}
+		session['artist_info'][artist_id] = artist_info
+		
+		# with open('mocking_dummy.json', 'w') as f:
+		# 	json.dump(artist_info, f)
+		return render_template('artist.html', artist_image_url=artist_image_url, artist_name=artist_name, followers=followers_str, album_info=album_info, liked_tracks=liked_tracks, top_tracks=top_tracks, single_info=single_info, compilation_info=compilation_info)
 	
-	# mocking_dummy = {
-	# 	'artist_image_url': artist_image_url,
-	# 	'artist_name': artist_name,
-	# 	'followers': followers_str,
-	# 	'album_info': album_info,
-	# 	'liked_tracks': [],
-	# 	'top_tracks': [],
-	# 	'single_info': single_info,
-	# 	'compilation_info': compilation_info
-	# }
-	# with open('mocking_dummy.json', 'w') as f:
-	# 	json.dump(mocking_dummy, f)
-	# return render_template('artist.html', artist_image_url=artist_image_url, artist_name=artist_name, followers=followers_str, album_info=album_info, liked_tracks=[], top_tracks=[], single_info=single_info, compilation_info=compilation_info)
-	
+
+
+	# with open('session_liked_songs.json', 'w') as f1:
+	# 	json.dump(session['artist_track_map'], f1)
+
 	# for mocking without repeating api calls
-	with open('mocking_dummy.json', 'r') as f:
-		mocking_dummy = json.load(f)
-	return render_template('artist.html', artist_image_url=mocking_dummy['artist_image_url'], artist_name=mocking_dummy['artist_name'], followers=mocking_dummy['followers'], album_info=mocking_dummy['album_info'], liked_tracks=mocking_dummy['liked_tracks'], top_tracks=mocking_dummy['top_tracks'], single_info=mocking_dummy['single_info'], compilation_info=mocking_dummy['compilation_info'])
+	# with open('mocking_dummy.json', 'r') as f:
+	# 	mocking_dummy = json.load(f)
+	# return render_template('artist.html', artist_image_url=mocking_dummy['artist_image_url'], artist_name=mocking_dummy['artist_name'], followers=mocking_dummy['followers'], album_info=mocking_dummy['album_info'], liked_tracks=mocking_dummy['liked_tracks'], top_tracks=mocking_dummy['top_tracks'], single_info=mocking_dummy['single_info'], compilation_info=mocking_dummy['compilation_info'])
 
 
 @app.route('/search/<query>')
