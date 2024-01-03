@@ -11,6 +11,7 @@
 
 <button id="playButton">Play All</button>
 <button id="pauseButton">Pause</button>
+<button id="resumeButton">Resume</button>
 <button id="skipButton">Skip</button>
 
 <ul id="audioList">
@@ -49,6 +50,13 @@
             // Pause the Web Audio API context and set the pause state
             audioContext.suspend();
             isPaused = true;
+        });
+
+        // resume button resumes the audio context
+        resumeButton.addEventListener('click', function() {
+            // Resume the Web Audio API context and set the pause state
+            audioContext.resume();
+            isPaused = false;
         });
 
         // skip button skips to the next track
