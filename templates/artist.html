@@ -13,6 +13,7 @@
     
   </head>
   <body>
+    <!-- top banner -->
     <div class='flex border-2 border-blue-400 items-center h-full'>
       <img src="{{artist_image_url}}" class="h-52 w-52 max-w-52 max-h-52 p-5 rounded-full" alt="artist image" />
       <div class='flex flex-col items-start justify-center h-full p-5 border-2 border-blue-300'>
@@ -27,6 +28,7 @@
       <div class="w-2/3 border-purple-900 border-2">
         <div class="grid gap-8 grid-cols-1 border-2 border-emerald-300 p-5">
           <h2>Liked Songs</h2>
+          <button id="playButton">play!</button>
           <div class='grid gap-1 grid-cols-7 border-2 border-yellow-300'>
             {% for track in liked_tracks %}
               <a href="{{ url_for('song_view', track_id=track['id']) }}">
