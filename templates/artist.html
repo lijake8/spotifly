@@ -28,7 +28,7 @@
       <div class="w-2/3 border-purple-900 border-2">
         <div class="grid gap-8 grid-cols-1 border-2 border-emerald-300 p-5">
           <h2>Liked Songs</h2>
-          <button id="playButton">play!</button>
+          <button type="button" id="playButton">play in player!</button>
           <div class='grid gap-1 grid-cols-7 border-2 border-yellow-300'>
             {% for track in liked_tracks %}
               <a href="{{ url_for('song_view', track_id=track['id']) }}">
@@ -137,9 +137,75 @@
       </div>
     </div>
 
+
+
+
+    <!-- Include scripts based on the selected mode
+    <script id="interactionScript"></script>
+
+    Event listener for radio buttons
+    <script type="module">
+      import { stopAudio } from "{{ url_for('static', filename='src/playSequential.js') }}";
+
+      const hoverMode = document.getElementById('hoverMode');
+      const playerMode = document.getElementById('playerMode');
+      let interactionScript = document.getElementById('interactionScript');
+
+      // Function to load interaction script based on mode
+      function loadInteractionScript(mode) {
+        // Remove the previously loaded script
+        interactionScript = document.getElementById('interactionScript');
+        console.log('removing script...', interactionScript)
+        
+        interactionScript.parentNode.removeChild(interactionScript);
+
+        // Create a new script element
+        const newScript = document.createElement('script');
+        newScript.id = 'interactionScript';
+        newScript.type = mode === 'hover'
+          ? 'module'
+          : 'module'; // ''
+        newScript.src = mode === 'hover'
+          ? "{{ url_for('static', filename='src/playOnHover.js') }}"
+          : "{{ url_for('static', filename='src/playSequential.js') }}";
+        console.log('new script source will be', newScript.src);
+
+        // Append the new script to the body
+        document.body.appendChild(newScript);
+        console.log('new script appended to body', newScript);
+      }
+
+      // Event listeners for radio buttons
+      hoverMode.addEventListener('change', () => {
+        console.log('hover mode selected');
+        if (hoverMode.checked) {
+          console.log('hover mode selected confirmed');
+          stopAudio();
+          loadInteractionScript('hover');
+        }
+      });
+
+      playerMode.addEventListener('change', () => {
+        console.log('player mode selected');
+        if (playerMode.checked) {
+          console.log('player mode selected confirmed');
+          stopAudio();
+          loadInteractionScript('player');
+        }
+      });
+
+      // Initial load based on default mode
+      console.log('loading initial player interaction script');
+      loadInteractionScript('player');
+    </script> -->
+
+
+
+
+
   
 
     <script type="module" src="{{ url_for('static', filename='src/playOnHover.js') }}"></script>
-    <!-- <script src="{{ url_for('static', filename='src/playOnHoverVisualizerTest.js') }}" type="module"></script> -->
+    <!-- <script src="{{ url_for('static', filename='src/playSequential.js') }}" ></script> -->
   </body>
 </html>

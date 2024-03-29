@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>page for player</title>
+    <link
+      rel="stylesheet"
+      href="{{url_for('static',filename='dist/output.css')}}"
+    />
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    
+  </head>
+  <body>
+    <div id="player" data-songdata="{{ liked_tracks }}" class="pt-12 pl-4 pr-4">
+      <img id="albumArt" src=".../static/images/black.jpg" alt="Album Art" class="w-full h-full object-cover rounded-3xl mb-4">
+      <h3 id="songName" class="text-center"></h3>
+      <h5 id="artistName" class="text-center pt-2"></h5>
+      <audio id="audio"></audio>
+      <div id="controls" class="flex justify-center items-center space-x-4 pt-8">
+          <button id="prevBtn" class="p-4 text-6xl">
+            <span class="glyphicon glyphicon-step-backward"></span>
+          </button>
+          <button id="playPauseBtn" class="p-4 text-8xl text-center ">
+            <span class="glyphicon glyphicon-play"></span>
+          </button>
+          <button id="nextBtn" class="p-4 text-6xl">
+            <span class="glyphicon glyphicon-step-forward"></span>
+          </button>
+      </div>
+      <!-- <label for="genreFilter">Filter by Genre:</label> -->
+      <!-- <select id="genreFilter"></select> -->
+    </div>
+
+
+    <script>
+      
+      document.addEventListener("DOMContentLoaded", function () {
+        const audio = document.getElementById("audio");
+        audio.crossOrigin = "anonymous";
+        const songName = document.getElementById("songName");
+        const artistName = document.getElementById("artistName");
+        const albumArt = document.getElementById("albumArt");
+        const playPauseBtn = document.getElementById("playPauseBtn");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const genreFilter = document.getElementById("genreFilter");
+    
+        // Access embedded song data
+        const player = document.getElementById("player");
+        const songData = JSON.parse(player.dataset.songdata);
+    
+        let currentSongIndex = 0;
+        let isPlaying = false;
+        let filteredSongs = songData;
+    
+        // Web Audio API setup
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const gainNode = audioContext.createGain();
+        gainNode.connect(audioContext.destination);
+        console.log('debug!!!', audio);
+        const source = audioContext.createMediaElementSource(audio);
+        source.connect(gainNode);
+        console.log('initial source is ', source);
+    
+        // Populate genre filter
+        /*genreFilter.add(new Option("All", "All"));
+        const genres = [...new Set(songData.map(song => song.genre))];
+        genres.forEach(genre => {
+            const option = document.createElement("option");
+            option.value = genre;
+            option.text = genre;
+            genreFilter.add(option);
+        });*/
+    
+        // Update song list based on genre filter
+        /*genreFilter.addEventListener("change", function () {
+            const selectedGenre = genreFilter.value;
+            filteredSongs = songData.filter(song => song.genre === selectedGenre || selectedGenre === "All");
+            currentSongIndex = 0;
+            //playSong(filteredSongs[currentSongIndex]);
+        });*/
+    
+        // Initialize with the first song
+        //playSong(songData[0]);
+    
+        function playSong(song) {
+            console.log('source inside playSong is ', source);
+            //set parameters for current song
+            audio.src = song.preview_url;
+            songName.innerText = song.name;
+            artistName.innerText = song.artist;
+            albumArt.src = song.image;
+            //TODO: artist name
+
+            // Fade-in effect
+            const fadeTime = 2;
+            const duration = 29.75; 
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + fadeTime);
+    
+            //fade out effect
+            gainNode.gain.setValueAtTime(1, audioContext.currentTime + duration - fadeTime);
+            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration);
+
+            audioContext.resume();
+            audio.play();
+            isPlaying = true;
+            //change playPause button to pause icon
+            playPauseBtn.innerHTML = "<span class='glyphicon glyphicon-pause'></span>";
+    
+            // schedule next audio to play after current song ends
+            audio.onended = function () {
+                playNext();
+            };
+        }
+    
+        let firstplay = true;
+        function playPause() {
+            console.log('playpause from ', filteredSongs);
+            console.log('current index is ', currentSongIndex);
+            if (isPlaying) {
+                console.log('currently playing, now pausing...')
+                audioContext.suspend();
+                //audio.pause();
+                isPlaying = false;
+            } else {
+                console.log('currently paused, now playing...')
+                isPlaying = true;
+                if (firstplay) {
+                  console.log('first play triggered');
+                  firstplay = false;
+                  playSong(filteredSongs[currentSongIndex]);
+                } else {
+                  console.log('not first play');
+                  audioContext.resume();
+                  //playSong(filteredSongs[currentSongIndex]);
+                }
+            }
+            //isPlaying = !isPlaying;
+            playPauseBtn.innerHTML = isPlaying ? "<span class='glyphicon glyphicon-pause'></span>" : "<span class='glyphicon glyphicon-play'></span>";
+        }
+    
+        function playNext() {
+            let tmp = currentSongIndex;
+            currentSongIndex = (currentSongIndex + 1) % filteredSongs.length;
+            console.log('current index went from ', tmp, ' to ', currentSongIndex);
+            
+            // cancel future gainnode events: https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/cancelScheduledValues
+            gainNode.gain.cancelScheduledValues(audioContext.currentTime);
+            
+            //playSong(filteredSongs[currentSongIndex]);
+            setTimeout(playSong, 0, filteredSongs[currentSongIndex]);
+        }
+    
+        function playPrev() {
+            currentSongIndex = (currentSongIndex - 1 + filteredSongs.length) % filteredSongs.length;
+            
+            // cancel future gainnode events: https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/cancelScheduledValues
+            gainNode.gain.cancelScheduledValues(audioContext.currentTime);
+            
+            setTimeout(playSong, 0, filteredSongs[currentSongIndex]);
+        }
+    
+        playPauseBtn.addEventListener("click", playPause);
+        nextBtn.addEventListener("click", playNext);
+        prevBtn.addEventListener("click", playPrev);
+    });
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+    <!--
+    <div class="grid gap-8 grid-cols-1 border-2 border-emerald-300 p-5">
+      <div id="audioList" class='grid gap-1 grid-cols-7 border-2 border-yellow-300'>
+        {% for track in liked_tracks %}
+          <a href="{{ url_for('song_view', track_id=track['id']) }}">
+            <div class="hoverElement relative h-full" data-audio-url="{{track['preview_url']}}" data-track-name="{{track['name']}}" data-album-img="{{track['album_image_url']}}">
+              <audio crossorigin="anonymous" id="audio" src="{{track['preview_url']}}"></audio>
+              <img src="{{track['album_image_url']}}" alt="album cover" class="w-full h-full object-cover">
+            </div>
+          </a>
+        {% endfor %}
+      </div> 
+    </div> -->
+
+  
+
+    <!-- <script src="{{ url_for('static', filename='src/playSequential.js') }}" ></script> -->
+  </body>
+</html>

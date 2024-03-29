@@ -73,7 +73,20 @@ def index():
 		while track_results['next']:
 				track_results = spotify.next(track_results)
 				tracks.extend(track_results['items'])
-		session['liked_songs'] = [track['track'] for track in tracks]
+		liked_songs = [track['track'] for track in tracks if track['track']['preview_url'] is not None]
+
+		#add audio features to each liked song, 100 at a time
+		liked_song_ids = [song['id'] for song in liked_songs]
+		liked_song_features = []
+		for i in range(0, len(liked_song_ids), 100):
+				liked_song_features.extend(spotify.audio_features(liked_song_ids[i:i+100]))
+		for i in range(len(liked_songs)):
+				liked_songs[i]['audio_features'] = liked_song_features[i]
+
+
+		session['liked_songs'] = liked_songs
+		print('example tempo', liked_songs[0]['audio_features']['tempo'])
+
 
 
 		# cache saved (liked) tracks for each artist
@@ -367,8 +380,10 @@ def recommendations(track_id):
 def recommendation_sandbox():
 	"""Get recommendations based on song characteristics"""
 
+	#TODO: fix bug where sliders are reset after submitting form
+
 	def concatenate_slider_values(slider_values):
-		"""Concatenates the slider values as strings and returns the result."""
+		"""serverside method to concatenate, causes page reload"""
 		result = ""
 		for value in slider_values:
 				result += str(value)
@@ -378,7 +393,7 @@ def recommendation_sandbox():
 		slider_values = [int(request.form["slider1"]), int(request.form["slider2"]), int(request.form["slider3"])]
 
 		# Run the Python function to concatenate the slider values
-		result = concatenate_slider_values(slider_values)
+		result = 'backend result: ' + concatenate_slider_values(slider_values)
 
 		# Display the result below the button
 		return render_template("recommendation-sandbox.html", result=result)
@@ -388,6 +403,7 @@ def recommendation_sandbox():
 
 @app.route('/concatenate', methods=['GET', 'POST'])
 def concatenate():
+		"""clientside method to concatenate, dynamic page update without reload"""
 		if request.method == 'GET':
 				return render_template("concatenate.html")
 		if request.method == 'POST':
@@ -420,9 +436,67 @@ def test_autoplay():
 		data = {'song_urls': song_urls}
 		return render_template("test-autoplay.html", data=data)
 
+@app.route('/play/<type>/<data>')
+def play(type, data):
+		#use cases
+		#play all artist songs 
+		#play top songs from artist
+		#play liked songs from artist
+		#play specific playlist
+		#play album
+		#play user liked songs
+		#play generated playlist from recommendation sandbox
 
+		#type can be 'album' (includes singles), 'playlist', 'artist', 'liked', etc TBD
+
+
+		if type == 'liked':
+				if data == 'all':
+						#play all liked songs
+
+						
+						#for mocking
+						# liked_tracks = [
+						# 	{'name': 'song1', 'audio_url': '/static/cropped-audio-samples/1.mp3', 'genre': 'pop'},
+						# 	{'name': 'song2', 'audio_url': '/static/cropped-audio-samples/2.mp3', 'genre': 'electronic'},
+						# 	{'name': 'song3', 'audio_url': '/static/cropped-audio-samples/3.mp3', 'genre': 'pop'},
+						# 	{'name': 'song4', 'audio_url': '/static/cropped-audio-samples/4.mp3', 'genre': 'rock'},
+						# 	{'name': 'song5', 'audio_url': '/static/cropped-audio-samples/5.mp3', 'genre': 'rock'},
+						# 	{'name': 'song6', 'audio_url': '/static/cropped-audio-samples/6.mp3', 'genre': 'rock'},
+						# ]
+
+						#test: get only tracks 115-130 bpm with high energy and danceability
+						tempo_min = 100
+						tempo_max = 180
+						energy_min = 0.8
+						danceability_min = 0.6
+
+
+						liked_tracks = []
+						for song in session['liked_songs']:
+								if song['audio_features']['tempo'] >= tempo_min and song['audio_features']['tempo'] <= tempo_max and song['audio_features']['energy'] >= energy_min and song['audio_features']['danceability'] >= danceability_min:
+										liked_tracks.append({
+												'name': song['name'],
+												'artist': song['artists'][0]['name'], #TODO: handle multiple artists
+												'preview_url': song['preview_url'],
+												'image': song['album']['images'][0]['url'] if len(song['album']['images']) > 0 else 'https://www.freeiconspng.com/uploads/spotify-icon-2.png'
+										})
+								
+						
+						#shuffle liked_tracks
+						import random
+						random.shuffle(liked_tracks)
+
+						print('og liked tracks length', len(session['liked_songs']))
+						print('liked tracks length after filtering for danceability, energy, tempo', len(liked_tracks))
+
+
+						return render_template("player.html", liked_tracks=json.dumps(liked_tracks), test=[{'test': 'test'}])
+						# return session['liked_songs']
+				
+		return {}
 
 
 # In[4]: run app
 if __name__ == '__main__':
-	app.run(debug=True)
+	app.run(debug=True, host='0.0.0.0', port=5000)

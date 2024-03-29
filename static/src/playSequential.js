@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
   const audioList = document.getElementById('audioList');
+  const audioElements = audioList.querySelectorAll('audio');
+
   const playButton = document.getElementById('playButton');
   const pauseButton = document.getElementById('pauseButton');
   const skipButton = document.getElementById('skipButton');
+
   const audioContext = new (window.AudioContext || window.webkitAudioContext)();
   const gainNode = audioContext.createGain();
   let currentIndex = 0;
@@ -36,7 +39,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // skip button skips to the next track
   skipButton.addEventListener('click', function() {
       // If the "Skip" button is pressed, pause the current audio, reset its time, and move to the next track
-      const audioElements = audioList.querySelectorAll('audio');
       if (currentIndex < audioElements.length) {
           // If the audio is playing, pause it
           if (!audioElements[currentIndex].paused) {
@@ -56,13 +58,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function playSequentially() {
       console.log('called playSequentially')
-      const audioElements = audioList.querySelectorAll('audio');
 
       if (currentIndex < audioElements.length) {
+          console.log('debug!!!', audioElements[currentIndex]);
           const source = audioContext.createMediaElementSource(audioElements[currentIndex]);
           source.connect(gainNode);
+          console.log('source is ', source)
 
-          const fadeTime = 0.75;
+          const fadeTime = 1;
 
           console.log('audiocontext time', audioContext.currentTime);
           // fade in

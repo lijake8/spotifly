@@ -33,11 +33,16 @@
           Result: <span id="concatenated_result"></span>
       </div>
 
+
+
+
       <script>
+        // Update the value of the slider next to it
         function updateSliderValue(slider, value) {
             document.getElementById(slider).innerText = value;
         }
 
+        // Add an event listener to each slider
         document.querySelectorAll('input[type="range"]').forEach(slider => {
             const sliderId = slider.getAttribute('id');
             const valueSpanId = sliderId + '_value';
@@ -52,7 +57,7 @@
             updateSliderValue(valueSpanId, 50);
         });
 
-
+        // Add an event listener to the form to submit the data
         document.querySelector('form').addEventListener('submit', function (e) {
               e.preventDefault();
 

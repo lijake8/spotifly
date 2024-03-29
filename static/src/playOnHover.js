@@ -1,3 +1,5 @@
+console.log('playOnHover.js loaded');
+
 // Load module from Skypack CDN
 import AudioMotionAnalyzer from "https://cdn.skypack.dev/audiomotion-analyzer?min";
 // https://www.npmjs.com/package/audiomotion-analyzer#disconnectinput-node-stoptracks-
@@ -108,9 +110,7 @@ Array.from(hoverElements).forEach((element) => {
         currentHoverTrackName.textContent = '';
 
         // Reset currently playing track image
-        currentHoverTrackImage.src = '../static/images/blank.jpg'
-        // currentHoverTrackImage.style.display='none'; //TODO: remove if necessary when changing to blank image
-        
+        currentHoverTrackImage.src = '../static/images/blank.jpg'        
     });
 
 });
